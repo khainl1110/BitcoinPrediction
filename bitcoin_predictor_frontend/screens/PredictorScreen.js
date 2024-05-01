@@ -1,62 +1,101 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { StyleSheet, Text, View, Button, Image, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, ScrollView, FlatList } from 'react-native';
 import FilterButton from '../components/FilterButton';
 import Result from '../components/Result';
 import Header from '../components/Header';
 import Table from '../components/Table';
 import TableHeader from '../components/TableHeader';
 import RefreshButton from '../components/RefreshButton';
-import api from "../api/api";
-import endpoints from "../api/endpoints";
 import { create } from 'apisauce';
 
 function PredictorScreen({ navigation }) {
 
     const [data, setData] = useState([]);
-    const allActualPrice = ''
-    const allFeatures = ''
-    const allPredictedPrice = ''
-    const predictedPrice = ''
+    const [allActualPrice, setAllActualPrice] = useState(null);
+    const [allFeatures, setDataAllFeatures] = useState(null);
+    const [allPredictedPrice, setAllPredictedPrice] = useState(null);
+    const [setPredictedPrice, predictedPrice] = useState(null);
+    const [loading, setLoading] = useState(true); // State variable to track loading state
 
-    const [message, setMessage] = useState(null);
 
-    https://api.coindesk.com/v1/bpi/currentprice.json
+    const currentDate = new Date();
+    // Add one day to the current date
+    const tomorrowDate = new Date(currentDate);
+    tomorrowDate.setDate(currentDate.getDate() + 1);
+    const tomorrowDay = String(tomorrowDate.getDate()).padStart(2, '0');
+    const tomorrowMonth = String(tomorrowDate.getMonth() + 1).padStart(2, '0'); // Month is zero-based, so add 1
+    const tomorrowYear = tomorrowDate.getFullYear();
+    // Format the date as "YYYY-MM-DD"
+    const tomorrowFormatted = `${tomorrowYear}-${tomorrowMonth}-${tomorrowDay}`;
+
+
+    console.log(tomorrowFormatted)
+
+
+
     useEffect(() => {
         // Create an Apisauce client
         const api = create({
-            baseURL: 'http://127.0.0.1:8000/', // Replace with your API base URL
+            baseURL: 'http://localhost/', // Replace with your API base URL
         });
 
         // Define a function to fetch data
         const fetchData = async () => {
+            setLoading(true); // Set loading to true before making the request
             try {
                 // Make a GET request using Apisauce
-                const response = await api.get('greetings');
-                // Extract the data from the response
+                const response = await api.get(`predict/${tomorrowFormatted}`);
+
                 // Check if response is successful
                 if (response.ok) {
-                    // Extract the message from the response
-                    setMessage(response.data.message);
+                    // Extract the data from the response
+                    const { jsonAllActualPrice, allFeatures, allPredictedPrice, predictedPrice } = response.data;
+
+                    // Extract data from the JSON object and convert to array of objects
+                    const allActualPrice = Object.entries(jsonAllActualPrice.allActualPrice).map(([index, value]) => ({
+                        id: index,
+                        value: value,
+                    }));
+                    // Update state variables with the extracted data
+                    setAllActualPrice(allActualPrice);
+                    setDataAllFeatures(allFeatures);
+                    setAllPredictedPrice(allPredictedPrice);
+                    setPredictedPrice(predictedPrice)
                 } else {
                     // Handle unsuccessful response
                     console.error('Failed to fetch data:', response.problem);
                 }
-                console.log(response.data)
-                setData(response.data);
             } catch (error) {
                 // Handle any errors that occur during the request
                 console.error('Error fetching data:', error);
+            } finally {
+                setLoading(false); // Set loading to false after the request completes
             }
         };
 
-        fetchData();
+        fetchData(); // Call the fetchData function
 
-    }, [])
+    }, []); // Empty dependency array means this effect runs only once, on mount
 
+    /*const displayArrayAsRows = (allPredictedPrice) => {
+        return allPredictedPrice.map((item, index) => (
+            <Table key={index} label="Apr 1" predictedPrice={item} actualPrice={"$13,123"} difference="$3212" accuracy="80%" /?
+        ));
+    };*/
+
+    const renderItem = ({ item }) => (
+        <View style={{ padding: 10 }}>
+            <Text>Index: {item.id}, Value: {item.value}</Text>
+        </View>
+    );
+
+    console.log(allFeatures)
+    console.log(allPredictedPrice)
+    console.log(allActualPrice)
+    console.log(predictedPrice)
 
     return (
         <View style={styles.pageOrganizer}>
-
             <View style={styles.header}>
                 <Text style={styles.titleFont}>Marchine Learning for Bitcoin Price Prediction</Text>
                 <RefreshButton label="Refresh" />
@@ -67,7 +106,7 @@ function PredictorScreen({ navigation }) {
                 }
                 <View style={styles.predictorView}>
                     <View style={styles.predictorBackground}>
-                        <Header label="Predictasdasdasdion" caption={predictedPrice} image="Prediction" />
+                        <Header label="Predictasdasdasdion" caption="Predictasdasdasdion" image="Prediction" />
                         <View style={styles.filter}>
                             <FilterButton label="Monthly" />
                             <FilterButton label="Weekly" />
@@ -97,16 +136,11 @@ function PredictorScreen({ navigation }) {
                         <Header label="History" caption="Correlation Ethereum vs Bitcoin" image="History" />
                         <View style={{ width: '99%', top: 5, alignSelf: 'center' }}>
                             <TableHeader />
-                            <ScrollView style={{ height: 250 }}>
-                                <Table label="Apr 1" predictedPrice="$12,345" actualPrice={"$13,123"} difference="$3212" accuracy="80%" />
-                                <Table label="Apr 2" predictedPrice="$12,345" actualPrice={"$13,123"} difference="$3212" accuracy="80%" />
-                                <Table label="Apr 3" predictedPrice="$12,345" actualPrice={"$13,123"} difference="$3212" accuracy="80%" />
-                                <Table label="Apr 4" predictedPrice="$12,345" actualPrice={"$13,123"} difference="$3212" accuracy="80%" />
-                                <Table label="Apr 5" predictedPrice="$12,345" actualPrice={"$13,123"} difference="$3212" accuracy="80%" />
-                                <Table label="Apr 3" predictedPrice="$12,345" actualPrice={"$13,123"} difference="$3212" accuracy="80%" />
-                                <Table label="Apr 4" predictedPrice="$12,345" actualPrice={"$13,123"} difference="$3212" accuracy="80%" />
-                                <Table label="Apr 5" predictedPrice="$12,345" actualPrice={"$13,123"} difference="$3212" accuracy="80%" />
-                            </ScrollView>
+                            <FlatList
+                                data={allActualPrice}
+                                renderItem={renderItem}
+                                keyExtractor={item => item.id.toString()}
+                            />
                         </View>
                     </View>
 
@@ -129,8 +163,6 @@ function PredictorScreen({ navigation }) {
                                 </View>
                             </View>
                         </View>
-
-
                     </View>
                 </View>
             </View>

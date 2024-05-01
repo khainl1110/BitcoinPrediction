@@ -1,13 +1,16 @@
 
 ## in command prompt run: uvicorn main:app --reload
+##  python3 -m uvicorn main:app
 import pandas as pd
 import seaborn
 import matplotlib.pyplot as plt
 import numpy as np
 import warnings
 import random
+import re
 from typing import Union
 from fastapi import FastAPI
+
 
 app = FastAPI()
 
@@ -221,10 +224,18 @@ class Predictor:
 async def read_root():
     return {"message": "Hello, World!"}
 
+def is_valid_date_format(date_string):
+    date_regex = r'^\d{4}-\d{2}-\d{2}$'
+    return bool(re.match(date_regex, date_string))
+
 @app.get("/predict/{date}")
 async def predict(date: str):
-    allActualPrice, allFeatures, allPredictedPrice, predictedPrice = predict(date)
-    return {"allActualPrice": allActualPrice, "allFeatures": allFeatures, "allPredictedPrice": allPredictedPrice, "predictedPrice": predictedPrice}
+    if (is_valid_date_format(date)):
+        allActualPrice, allFeatures, allPredictedPrice, predictedPrice = predict(date)
+        return {"allActualPrice": allActualPrice, "allFeatures": allFeatures, "allPredictedPrice": allPredictedPrice, "predictedPrice": predictedPrice}
+    else:
+        return {"Validation": "Invalid Date format. Expected YYYY-MM-DD!"} 
+
 
 def predict(date):
     dataframe = handleData()
