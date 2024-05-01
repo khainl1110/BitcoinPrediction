@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { StyleSheet, Text, View, Button, Image, ScrollView } from 'react-native';
 import FilterButton from '../components/FilterButton';
 import Result from '../components/Result';
@@ -6,12 +6,60 @@ import Header from '../components/Header';
 import Table from '../components/Table';
 import TableHeader from '../components/TableHeader';
 import RefreshButton from '../components/RefreshButton';
+import api from "../api/api";
+import endpoints from "../api/endpoints";
+import { create } from 'apisauce';
+
 function PredictorScreen({ navigation }) {
+
+    const [data, setData] = useState([]);
+    const allActualPrice = ''
+    const allFeatures = ''
+    const allPredictedPrice = ''
+    const predictedPrice = ''
+
+    const [message, setMessage] = useState(null);
+
+    https://api.coindesk.com/v1/bpi/currentprice.json
+    useEffect(() => {
+        // Create an Apisauce client
+        const api = create({
+            baseURL: 'http://127.0.0.1:8000/', // Replace with your API base URL
+        });
+
+        // Define a function to fetch data
+        const fetchData = async () => {
+            try {
+                // Make a GET request using Apisauce
+                const response = await api.get('greetings');
+                // Extract the data from the response
+                // Check if response is successful
+                if (response.ok) {
+                    // Extract the message from the response
+                    setMessage(response.data.message);
+                } else {
+                    // Handle unsuccessful response
+                    console.error('Failed to fetch data:', response.problem);
+                }
+                console.log(response.data)
+                setData(response.data);
+            } catch (error) {
+                // Handle any errors that occur during the request
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+
+    }, [])
+
+
     return (
         <View style={styles.pageOrganizer}>
+
             <View style={styles.header}>
                 <Text style={styles.titleFont}>Marchine Learning for Bitcoin Price Prediction</Text>
-                <RefreshButton label="Refresh"/>
+                <RefreshButton label="Refresh" />
             </View>
             <View style={styles.grapOrganizer}>
                 {
@@ -19,7 +67,7 @@ function PredictorScreen({ navigation }) {
                 }
                 <View style={styles.predictorView}>
                     <View style={styles.predictorBackground}>
-                        <Header label="Prediction" caption="Bitcoin price prediction via linear regression" image="Prediction" />
+                        <Header label="Predictasdasdasdion" caption={predictedPrice} image="Prediction" />
                         <View style={styles.filter}>
                             <FilterButton label="Monthly" />
                             <FilterButton label="Weekly" />
@@ -30,7 +78,7 @@ function PredictorScreen({ navigation }) {
                         {
                             //Analysis 
                         }
-                        <Header label="Analysis" caption="Bitcoin price prediction via linear regression" image="Analyis"/>
+                        <Header label="Analysis" caption="Bitcoin price prediction via linear regression" image="Analyis" />
                         {
                             //Prediction Analysis 
                         }
@@ -75,7 +123,7 @@ function PredictorScreen({ navigation }) {
 
                         <View style={{ height: '100%', width: '49%', borderWidth: 1 }}>
                             <View style={styles.correlation}>
-                                <Header label="Correlation Ethereum vs Bitcoin" caption="Ethereum vs Bitcoin" image="Correlation"/>
+                                <Header label="Correlation Ethereum vs Bitcoin" caption="Ethereum vs Bitcoin" image="Correlation" />
                                 <View>
                                     <Text>Graph</Text>
                                 </View>

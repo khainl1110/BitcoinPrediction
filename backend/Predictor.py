@@ -54,4 +54,4 @@ class Predictor:
         self.x_btcHigh_train = X_train_btcHigh 
         self.y_btcHigh_train = y_train_btcHigh 
         
-        return y_pred_btcHigh.tail(1).to_string(index=False)
+        return y_train_btcHigh, X_train_btcHigh, y_pred_btcHigh, y_pred_btcHigh.tail(1).to_string(index=False)
