@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { StyleSheet, Text, View, Button, Image, ScrollView, FlatList } from 'react-native';
+//import { StyleSheet, Text, View, Button, Image, ScrollView, FlatList } from 'react-native-web';
 import FilterButton from '../components/FilterButton';
 import Result from '../components/Result';
 import Header from '../components/Header';
@@ -11,11 +12,16 @@ import { create } from 'apisauce';
 function PredictorScreen({ navigation }) {
 
     const [data, setData] = useState([]);
-    const [allActualPrice, setAllActualPrice] = useState(null);
-    const [allFeatures, setDataAllFeatures] = useState(null);
-    const [allPredictedPrice, setAllPredictedPrice] = useState(null);
+    const [allActualPrice, setAllActualPrice] = useState([]);
+    const [allFeaturesDate, setDataAllFeaturesDate] = useState([]);
+    const [allPredictedPrice, setAllPredictedPrice] = useState([]);
     const [setPredictedPrice, predictedPrice] = useState(null);
     const [loading, setLoading] = useState(true); // State variable to track loading state
+
+
+    // Check if data has a value
+    const hasData = allPredictedPrice !== null && allPredictedPrice !== undefined && allPredictedPrice !== '';
+
 
 
     const currentDate = new Date();
@@ -28,8 +34,7 @@ function PredictorScreen({ navigation }) {
     // Format the date as "YYYY-MM-DD"
     const tomorrowFormatted = `${tomorrowYear}-${tomorrowMonth}-${tomorrowDay}`;
 
-
-    console.log(tomorrowFormatted)
+   // console.log(tomorrowFormatted)
 
     useEffect(() => {
         // Create an Apisauce client
@@ -42,18 +47,13 @@ function PredictorScreen({ navigation }) {
             try {
                 // Make a GET request using Apisauce
                 const response = await api.get(`predict/${tomorrowFormatted}`);
-                console.log("here")
                 // Check if response is successful
                 if (response.ok) {
                     // Extract the data from the response
 
-                    console.log(response.data.allActualPrice)
-                    console.log(response.data.allPredictedPrice)
-                    console.log(response.data.predictedPrice)
-                    console.log("allActualPrice")
-
                     setAllPredictedPrice(response.data.allPredictedPrice)
                     setAllActualPrice(response.data.allActualPrice)
+                    setDataAllFeaturesDate(response.data.allFeatures.Date)
 
 
                 } else {
@@ -67,7 +67,7 @@ function PredictorScreen({ navigation }) {
                 setLoading(false); // Set loading to false after the request completes
             }
         };
-        //fetchData();
+        fetchData();
 
     }, []); // Empty dependency array means this effect runs only once, on mount
 
@@ -82,19 +82,53 @@ function PredictorScreen({ navigation }) {
             <Text>{item}</Text>
         </View>
     );
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Add leading zero if needed
+        const day = String(date.getDate()).padStart(2, '0'); // Add leading zero if needed
+        return `${year}-${month}-${day}`;
+      };
 
     let dataArrayPredicted = [];
     let dataArrayActual = [];
-    if (allPredictedPrice != null) {
-        dataArrayPredicted = Object.entries(allPredictedPrice).map(([key, value]) => value);
+    let dataArrayDate = [];
+    let formattedDatesArray = []
+    if (allPredictedPrice.length != 0 && allPredictedPrice != undefined){
+        console.log("============actual price===============")
+        console.log(allPredictedPrice)
+        if (allPredictedPrice != null || allPredictedPrice != undefined) {
+            dataArrayPredicted = Object.entries(allPredictedPrice).map(([key, value]) => value);
+        }
+        if (allActualPrice != null || allActualPrice != undefined) {
+            dataArrayActual = Object.entries(allActualPrice).map(([key, value]) => value);
+        }
+        if (allFeaturesDate != null || allFeaturesDate != undefined) {
+            dataArrayDate = Object.entries(allFeaturesDate).map(([key, value]) => value);
+        }
+        formattedDatesArray = dataArrayDate.map(formatDate);
+        console.log(dataArrayDate);
+        //DO NOTHING
+    }else{
+        console.log("============actual price not null===============")
+        console.log(allPredictedPrice.length)
     }
-    if (allPredictedPrice != null) {
-        dataArrayActual = Object.entries(allActualPrice).map(([key, value]) => value);
-    }
-    console.log("===========all predicted price array================")
-    console.log(dataArrayPredicted);
-    console.log("============actual price===============")
-    console.log(dataArrayActual)
+    //if (allPredictedPrice === null){
+        //DO NOTHING
+   // }
+   // else{
+    //    if (allPredictedPrice != null || allPredictedPrice != undefined) {
+       //     dataArrayActual = Object.entries(allActualPrice).map(([key, value]) => value);
+     //   }
+    //}
+   
+    
+     // If data is null, display a loading message
+ 
+   //console.log("===========all predicted price array================")
+    //console.log(dataArrayPredicted);
+    //console.log("============actual price===============")
+    //console.log(dataArrayActual)
 
 
     return (
@@ -105,6 +139,15 @@ function PredictorScreen({ navigation }) {
             </View>
             <Header label="Prediction" caption="Predictions" image="Prediction" />
             <View style={{ flexDirection: 'row' }}>
+                {dataArrayDate != null ? (
+                    <FlatList
+                        data={dataArrayDate}
+                        renderItem={renderItem}
+                        keyExtractor={(item, index) => index.toString()}
+                    />
+                ) : (
+                    <Text>Loading...</Text>
+                )}
                 {allPredictedPrice != null ? (
                     <FlatList
                         data={dataArrayPredicted}

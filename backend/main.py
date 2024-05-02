@@ -178,7 +178,7 @@ class Predictor:
         self.y_btcHigh_pred = []
         self.x_btcHigh_train = []
         self.y_btcHigh_train = []
-        
+    
     def getAllPredictionsBTCHigh(self):
         return self.y_btcHigh_pred
     
@@ -315,7 +315,7 @@ def mergeColumn(btc, eth, spy):
 
 
 class LinearRegressionRegularization:
-    def __init__(self, max_iter=2,  learningRate=90, random_state=None):
+    def __init__(self, max_iter=6,  learningRate=90, random_state=None):
         self.max_iter_ = max_iter
         self.alpha = learningRate
         self.random_state_ = random_state
@@ -509,7 +509,7 @@ class LinearRegressionRegularization:
             self.x_btcHigh_train = X_train_btcHigh 
             self.y_btcHigh_train = y_train_btcHigh 
             
-            return y_pred_btcHigh.tail(1).to_string(index=False)
+            return self.X.tail(30), y_pred_btcHigh.tail(30).to_string(index=False)
             
 
 
