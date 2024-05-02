@@ -1,8 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { StyleSheet, Text, View, Button, Image, TouchableOpacity } from 'react-native';
-function FilterButton({ navigation, label}) {
+function FilterButton({ navigation, label, onPress}) {
     return (
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button}  onPress={onPress}>
             <Text style={styles.titleFont}>{label}</Text>
         </TouchableOpacity>
     );

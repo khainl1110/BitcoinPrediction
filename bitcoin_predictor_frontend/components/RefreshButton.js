@@ -9,7 +9,7 @@ function RefreshButton({ navigation, label}) {
 }
 const styles = StyleSheet.create({
     titleFont: {
-        fontSize: 18,
+        fontSize: 24,
         textAlign: 'center',
     },
     button:{
