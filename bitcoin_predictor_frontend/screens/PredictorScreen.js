@@ -31,36 +31,31 @@ function PredictorScreen({ navigation }) {
 
     console.log(tomorrowFormatted)
 
-
-
     useEffect(() => {
         // Create an Apisauce client
         const api = create({
-            baseURL: 'http://localhost/', // Replace with your API base URL
+            baseURL: 'http://18.116.42.185/', // Replace with your API base URL
         });
-
         // Define a function to fetch data
         const fetchData = async () => {
             setLoading(true); // Set loading to true before making the request
             try {
                 // Make a GET request using Apisauce
                 const response = await api.get(`predict/${tomorrowFormatted}`);
-
+                console.log("here")
                 // Check if response is successful
                 if (response.ok) {
                     // Extract the data from the response
-                    const { jsonAllActualPrice, allFeatures, allPredictedPrice, predictedPrice } = response.data;
 
-                    // Extract data from the JSON object and convert to array of objects
-                    const allActualPrice = Object.entries(jsonAllActualPrice.allActualPrice).map(([index, value]) => ({
-                        id: index,
-                        value: value,
-                    }));
-                    // Update state variables with the extracted data
-                    setAllActualPrice(allActualPrice);
-                    setDataAllFeatures(allFeatures);
-                    setAllPredictedPrice(allPredictedPrice);
-                    setPredictedPrice(predictedPrice)
+                    console.log(response.data.allActualPrice)
+                    console.log(response.data.allPredictedPrice)
+                    console.log(response.data.predictedPrice)
+                    console.log("allActualPrice")
+
+                    setAllPredictedPrice(response.data.allPredictedPrice)
+                    setAllActualPrice(response.data.allActualPrice)
+
+
                 } else {
                     // Handle unsuccessful response
                     console.error('Failed to fetch data:', response.problem);
@@ -72,8 +67,7 @@ function PredictorScreen({ navigation }) {
                 setLoading(false); // Set loading to false after the request completes
             }
         };
-
-        fetchData(); // Call the fetchData function
+        //fetchData();
 
     }, []); // Empty dependency array means this effect runs only once, on mount
 
@@ -85,88 +79,51 @@ function PredictorScreen({ navigation }) {
 
     const renderItem = ({ item }) => (
         <View style={{ padding: 10 }}>
-            <Text>Index: {item.id}, Value: {item.value}</Text>
+            <Text>{item}</Text>
         </View>
     );
 
-    console.log(allFeatures)
-    console.log(allPredictedPrice)
-    console.log(allActualPrice)
-    console.log(predictedPrice)
+    let dataArrayPredicted = [];
+    let dataArrayActual = [];
+    if (allPredictedPrice != null) {
+        dataArrayPredicted = Object.entries(allPredictedPrice).map(([key, value]) => value);
+    }
+    if (allPredictedPrice != null) {
+        dataArrayActual = Object.entries(allActualPrice).map(([key, value]) => value);
+    }
+    console.log("===========all predicted price array================")
+    console.log(dataArrayPredicted);
+    console.log("============actual price===============")
+    console.log(dataArrayActual)
+
 
     return (
-        <View style={styles.pageOrganizer}>
-            <View style={styles.header}>
-                <Text style={styles.titleFont}>Marchine Learning for Bitcoin Price Prediction</Text>
+        <View>
+             <View style={styles.header}>
+                <Text>Marchine Learning for Bitcoin Price Prediction</Text>
                 <RefreshButton label="Refresh" />
             </View>
-            <View style={styles.grapOrganizer}>
-                {
-                    //First Panel
-                }
-                <View style={styles.predictorView}>
-                    <View style={styles.predictorBackground}>
-                        <Header label="Predictasdasdasdion" caption="Predictasdasdasdion" image="Prediction" />
-                        <View style={styles.filter}>
-                            <FilterButton label="Monthly" />
-                            <FilterButton label="Weekly" />
-                            <FilterButton label="Yearly" />
-                        </View>
-                    </View>
-                    <View style={styles.predictionContainer}>
-                        {
-                            //Analysis 
-                        }
-                        <Header label="Analysis" caption="Bitcoin price prediction via linear regression" image="Analyis" />
-                        {
-                            //Prediction Analysis 
-                        }
-                        <Result label="Predicted Price" caption="Bitcoin price prediction via linear regression" value="$12,345" />
-                        <Result label="Market Price" caption="Bitcoin price prediction via linear regression" value="$12,345" />
-                        <Result label="Accuracy" caption="Bitcoin price prediction via linear regression" value="$12,345" />
-                        <Result label="Difference" caption="Bitcoin price prediction via linear regression" value="$12,345" />
-
-                    </View>
-                </View>
-                {
-                    //Second Panel
-                }
-                <View style={{ width: '60%', height: '99%', justifyContent: 'space-around' }}>
-                    <View style={{ borderWidth: 1, width: '100%', height: '49%', }}>
-                        <Header label="History" caption="Correlation Ethereum vs Bitcoin" image="History" />
-                        <View style={{ width: '99%', top: 5, alignSelf: 'center' }}>
-                            <TableHeader />
-                            <FlatList
-                                data={allActualPrice}
-                                renderItem={renderItem}
-                                keyExtractor={item => item.id.toString()}
-                            />
-                        </View>
-                    </View>
-
-                    <View style={styles.correlationView}>
-
-                        <View style={{ height: '100%', width: '50%', borderWidth: 1 }}>
-                            <View style={styles.correlation}>
-                                <Header label="Correlation S&P 500 vs Bitcoin" caption="Correlation S&P 500 vs Bitcoin" image="Correlation" />
-                                <View>
-                                    <Text>Graph</Text>
-                                </View>
-                            </View>
-                        </View>
-
-                        <View style={{ height: '100%', width: '49%', borderWidth: 1 }}>
-                            <View style={styles.correlation}>
-                                <Header label="Correlation Ethereum vs Bitcoin" caption="Ethereum vs Bitcoin" image="Correlation" />
-                                <View>
-                                    <Text>Graph</Text>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                </View>
+            <Header label="Prediction" caption="Predictions" image="Prediction" />
+            <View style={{ flexDirection: 'row' }}>
+                {allPredictedPrice != null ? (
+                    <FlatList
+                        data={dataArrayPredicted}
+                        renderItem={renderItem}
+                        keyExtractor={(item, index) => index.toString()}
+                    />
+                ) : (
+                    <Text>Loading...</Text>
+                )}
+                {dataArrayActual != null ? (
+                    <FlatList
+                        data={dataArrayActual}
+                        renderItem={renderItem}
+                        keyExtractor={(item, index) => index.toString()}
+                    />
+                ) : (
+                    <Text>Loading...</Text>
+                )}
             </View>
-
         </View>
 
     );
@@ -175,7 +132,7 @@ const styles = StyleSheet.create({
     header: {
         alignSelf: 'center',
         width: '100%',
-        height: '7%',
+        height: '15%',
         backgroundColor: '#FCCB00',
         justifyContent: 'space-between',
         flexDirection: 'row'
