@@ -9,16 +9,19 @@ function TableHeader({ navigation, label }) {
                 <Text style={styles.titleFont}>Date</Text>
             </View>
             <View>
-                <Text style={styles.titleFont}>Predicted</Text>
+                <Text style={styles.titleFont}>Prediction High</Text>
             </View>
             <View>
-                <Text style={styles.titleFont}>Market</Text>
+                <Text style={styles.titleFont}>Open</Text>
             </View>
             <View>
-                <Text style={styles.titleFont}>Difference</Text>
+                <Text style={styles.titleFont}>Close</Text>
             </View>
             <View>
-                <Text style={styles.titleFont}>Accuracy</Text>
+                <Text style={styles.titleFont}>High</Text>
+            </View>
+            <View>
+                <Text style={styles.titleFont}>Low</Text>
             </View>
         </View>
     );
@@ -34,12 +37,13 @@ const styles = StyleSheet.create({
     tableHeader: {
         flexDirection: 'row',
         alignSelf: 'center',
-        justifyContent: 'space-around',
+        paddingLeft: 70,
+        paddingRight: 70,
+        justifyContent: 'space-between',
         alignItems: 'center',
         alignContent: 'center',
         borderBottomWidth: 1,
         width: '100%',
-        height: '10%',
         backgroundColor: '#DBDBDB',
     },
 });
