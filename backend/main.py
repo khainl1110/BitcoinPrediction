@@ -309,7 +309,7 @@ async def predict(date: str):
         #X0.drop(X0.index[-1], inplace=True)
         #index = len(X0)
         #X0.loc[index] = new_row
-        #X0.fillna(X0.mean(), inplace=True)
+        X0.fillna(X0.mean(), inplace=True)
         return {"Predictions": X0.tail(15)}
     else:
         return {"Validation": "Invalid Date format. Expected YYYY-MM-DD!"} 
