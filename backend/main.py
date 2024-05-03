@@ -110,24 +110,25 @@ class LinearRegressionRegularization:
         return y_pred_btc
         
 class Utils:  
+
     def _updateTrainingData(self, x_train):
+        num_days = 7  # Number of days to lag
+        lagged_columns = []
+
         for i in x_train.columns:
             if i != 'Date':
-                x_train['yesterday_' +i] = x_train[i]
-                x_train['twoDaysAgo_' +i] = x_train[i]
-                x_train['threeDaysAgo_' +i] = x_train[i]
-                x_train['fourDaysAgo_' +i] = x_train[i]
-                x_train['fiveDaysAgo_' +i] = x_train[i]
-                x_train['sixDaysAgo_' +i] = x_train[i]
-                x_train['sevenDaysAgo_' +i] = x_train[i]
-                x_train['yesterday_' +i] = x_train['yesterday_' +i].shift(1)
-                x_train['twoDaysAgo_' +i] = x_train['twoDaysAgo_' +i].shift(2)
-                x_train['threeDaysAgo_' +i] = x_train['threeDaysAgo_' +i].shift(3)
-                x_train['fourDaysAgo_' +i] = x_train['fourDaysAgo_' +i].shift(4)
-                x_train['fiveDaysAgo_' +i] = x_train['fiveDaysAgo_' +i].shift(5)
-                x_train['sixDaysAgo_' +i] = x_train['sixDaysAgo_' +i].shift(6)
-                x_train['sevenDaysAgo_' +i] = x_train['sevenDaysAgo_' +i].shift(7)
-                x_train = x_train.drop(i, axis = 1)
+                for lag in range(1, num_days + 1):
+                    new_column_name = f'{lag}DaysAgo_{i}'
+                    lagged_column = x_train[i].shift(lag)
+                    lagged_columns.append(lagged_column)
+
+        # Concatenate all new columns at once
+        lagged_df = pd.concat(lagged_columns, axis=1)
+        lagged_df.columns = [f'{lag}DaysAgo_{col}' for lag in range(1, num_days + 1) for col in x_train.columns if col != 'Date']
+
+        # Combine lagged_df with x_train
+        x_train = pd.concat([x_train[['Date']], lagged_df], axis=1)
+
         return x_train
     
     def _updateDate(self, x_train):
@@ -290,13 +291,10 @@ def is_valid_date_format(date_string):
 async def predict(date: str):
     if (is_valid_date_format(date)):
         X0, predHigh, predLow, predOpen, predClose  = predict(date)
-        new_row = {'Date': date, 'btcHigh':predHigh, 'btcLow':predLow, 'btcOpen':predOpen, 'btcClose':predClose }
-        X0.drop(X0.index[-1], inplace=True)
-        index = len(X0)
-        X0.loc[index] = new_row
-        X0.fillna(X0.mean(), inplace=True)
-        X0.tail(15)
-        return {"predictions": X0}
+        X0.iloc[-1] = {'Date': date, 'btcHigh': predHigh, 'btcLow': predLow, 'btcOpen': predOpen, 'btcClose': predClose}
+        X0.fillna(method='ffill', inplace=True) 
+        
+        return {"predictions": X0.tail(15)}
     else:
         return {"Validation": "Invalid Date format. Expected YYYY-MM-DD!"} 
 
