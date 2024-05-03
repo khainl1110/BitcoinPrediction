@@ -197,7 +197,7 @@ function PredictorScreen({ navigation }) {
             <TableHeader />
 
 
-            <View style={{ flexDirection: 'row', width:'90%', alignSelf: 'center'}}>
+            <View style={{ flexDirection: 'row', width:'90%', alignSelf: 'center', height: 300, backgroundColor: 'red'}}>
 
 
                 {dataArrayDate != null ? (
