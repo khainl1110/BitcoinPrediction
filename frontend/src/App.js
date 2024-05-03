@@ -14,10 +14,6 @@ function App() {
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading] = useState(true); // State variable to track loading state
 
-
-  // Check if data has a value
-  const hasData = predictions !== null && predictions !== undefined && predictions !== '';
-
   const currentDate = new Date();
   // Add one day to the current date
   const tomorrowDate = new Date(currentDate);
@@ -62,36 +58,39 @@ function App() {
 
   // console.log(tomorrowFormatted)
 
+
   console.log("here")
 
-    const fetchData = async () => {
-      setLoading(true); // Set loading to true before making the request
-      try {
-        const response = await fetch(`http://18.116.42.185/predict/${tomorrowFormatted}`);
-        // Check if response is successful
-        if (response.ok) {
-          console.log("In response ok")
-          // Extract the data from the response
-          setFeaturesDate(response.data.features.Date)
-          setFeaturesHigh(response.data.features.btcHigh)
-          setFeaturesLow(response.data.features.btcLow)
-          setFeaturesOpen(response.data.features.btcOpen)
-          setFeaturesClose(response.data.features.btcClose)
-          setPredictions(response.data.predictions)
-
-        } else {
-          // Handle unsuccessful response
-          console.error('Failed to fetch data:', response.problem);
+  const fetchData = async () => {
+    setLoading(true); // Set loading to true before making the request
+    //https://api.coindesk.com/v1/bpi/currentprice.json
+    //http://18.116.42.185/predict/${tomorrowFormatted}
+    try {
+      const response = await fetch(`http://18.116.42.185/predict/${tomorrowFormatted}`).then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
         }
-      } catch (error) {
-        // Handle any errors that occur during the request
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false); // Set loading to false after the request completes
-      }
-    };
- 
-  
+        return response.json(); // Parse JSON response
+      })
+        .then(data => {
+          setFeaturesDate(data.features.Date)
+          setFeaturesHigh(data.features.btcHigh)
+          setFeaturesLow(data.features.btcLow)
+          setFeaturesOpen(data.features.btcOpen)
+          setFeaturesClose(data.features.btcClose)
+          setPredictions(data.predictions)
+          console.log(data.features.Date)
+          setData(data); // Set the data in state
+        })
+    } catch (error) {
+      // Handle any errors that occur during the request
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false); // Set loading to false after the request completes
+    }
+  };
+
+
 
   let dataArrayOpen = [];
   let dataArrayClose = [];
@@ -100,9 +99,12 @@ function App() {
   let dataArrayLow = [];
   let dataArrayPredictions = [];
 
+  // Check if data has a value
+  const hasData = predictions !== null && predictions !== undefined && predictions !== '';
+
+
   if (predictions.length != 0 && predictions != undefined) {
     console.log("============actual price===============")
-    console.log(featuresDate)
     if (featuresOpen != null || featuresOpen != undefined) {
       dataArrayOpen = Object.entries(featuresOpen).map(([key, value]) => value);
     }
@@ -136,20 +138,46 @@ function App() {
     console.log("============actual price not null===============")
     console.log(dataArrayOpen)
   }
-
   const renderItem = ({ item }) => (
-    <div style={{ padding: '10px' }}>
-      <p>{item.name}</p>
+    <div style={{ padding: '10px', borderBottom: '1px solid black'}}>
+      <p>{item}</p>
+    </div>
+  );
+  const renderHeader = (header) => (
+    <div style={{ padding: '10px', fontWeight: 'bold', borderBottom: '1px solid black' }}>
+      <p>{header}</p>
     </div>
   );
   return (
     <div className="App">
-      <header className="App-header">
-        <text>hello</text>
-      </header>
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <ul style={{ listStyle: 'none', padding: 0 }}>
+      <div style={{ display: 'flex',}}>
+        
+        <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
+        {renderHeader('Date')}
+          {dataArrayDate.map(item => (
+            <li key={item.id}>
+              {renderItem({ item })}
+            </li>
+          ))}
+        </ul>
+        <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
+          {renderHeader('Open')}
           {dataArrayOpen.map(item => (
+            <li key={item.id}>
+              {renderItem({ item })}
+            </li>
+          ))}
+        </ul>
+        <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
+          {renderHeader('Close')}
+          {dataArrayClose.map(item => (
+            <li key={item.id}>
+              {renderItem({ item })}
+            </li>
+          ))}
+        </ul>
+        <ul style={{ listStyle: 'none', padding: 0 }}>
+          {dataArrayDate.map(item => (
             <li key={item.id}>
               {renderItem({ item })}
             </li>
