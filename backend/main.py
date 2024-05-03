@@ -11,6 +11,7 @@ import re
 from typing import Union
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sklearn.linear_model import LinearRegression
 
 app = FastAPI()
 # Allow requests from all origins
@@ -211,25 +212,71 @@ class Predictor:
             
         # Split the data into training subsets
         train_data, test_data, = model._split(self.X, self.y, ratio=0.7, random_state=123 )
+    
         X_train_btcHigh = train_data.drop(columns=['btcHigh'])
         y_train_btcHigh = train_data['btcHigh']
-        #Adjust training data 
+        #
         X_train_btcHigh = utils._updateTrainingData(X_train_btcHigh)
         X_train_btcHigh = utils._replaceNanX(X_train_btcHigh)
         has_nan = X_train_btcHigh.isna().any().any()
-        if (has_nan != True):
-            #Predict
-            y_pred_btcHigh = model._predict(X_train_btcHigh, y_train_btcHigh)
-        else:
-            print ("Training Data contains Nan values, ", has_nan)
-        pd.options.mode.chained_assignment = None  #Hide warning
-        X_train_btcHigh["Date"] = utils._updateDate(X_train_btcHigh)
+        #
+        #Predict
+        model = LinearRegression()
+        model.fit(X_train_btcHigh, y_train_btcHigh)
+        y_pred_btcHigh = model.predict(X_train_btcHigh)
+        
+        # Predict Low
+        X_train_btcLow = train_data.drop(columns=['btcLow'])
+        y_train_btcLow = train_data['btcLow']
+        #
+        X_train_btcLow = utils._updateTrainingData(X_train_btcLow)
+        X_train_btcLow = utils._replaceNanX(X_train_btcLow)
+        has_nan = X_train_btcLow.isna().any().any()
+        #
+        model = LinearRegression()
+        model.fit(X_train_btcLow, y_train_btcLow)
+        y_pred_btcLow = model.predict(X_train_btcLow)
+    
+        # Predict Low
+        X_train_btcOpen = train_data.drop(columns=['btcOpen'])
+        y_train_btcOpen = train_data['btcOpen']
+        #
+        X_train_btcOpen = utils._updateTrainingData(X_train_btcOpen)
+        X_train_btcOpen = utils._replaceNanX(X_train_btcOpen)
+        has_nan = X_train_btcOpen.isna().any().any()
+        #
+        model = LinearRegression()
+        model.fit(X_train_btcOpen, y_train_btcOpen)
+        y_pred_btcOpen = model.predict(X_train_btcOpen)
+
+        # Predict Low
+        X_train_btcClose = train_data.drop(columns=['btcClose'])
+        y_train_btcClose = train_data['btcClose']
+        #
+        X_train_btcClose = utils._updateTrainingData(X_train_btcClose)
+        X_train_btcClose = utils._replaceNanX(X_train_btcClose)
+        has_nan = X_train_btcClose.isna().any().any()
+        #Predict
+        model = LinearRegression()
+        model.fit(X_train_btcClose, y_train_btcClose)
+        y_pred_btcClose = model.predict(X_train_btcClose)
+    
+        y_pred_btcHigh = pd.DataFrame(y_pred_btcHigh)
+        y_pred_btcLow = pd.DataFrame(y_pred_btcLow)
+        y_pred_btcOpen = pd.DataFrame(y_pred_btcOpen)
+        y_pred_btcClose = pd.DataFrame(y_pred_btcClose)
         
         self.y_btcHigh_pred = y_pred_btcHigh 
         self.x_btcHigh_train = X_train_btcHigh 
         self.y_btcHigh_train = y_train_btcHigh 
         
-        return self.X.dropna().tail(30), y_pred_btcHigh.tail(30)
+        y_pred_btcHigh_ = y_pred_btcHigh.iloc[-1:].iloc[-1:].values.flatten()
+        y_pred_btcLow_ = y_pred_btcLow.iloc[-1:].iloc[-1:].values.flatten()
+        y_pred_btcOpen_ = y_pred_btcOpen.iloc[-1:].iloc[-1:].values.flatten()
+        y_pred_btcClose_ = y_pred_btcClose.iloc[-1:].iloc[-1:].values.flatten()
+        
+        return self.X.tail(15), y_pred_btcHigh_[0], y_pred_btcLow_[0], y_pred_btcOpen_[0],y_pred_btcClose_[0]
+
 
 @app.get("/greetings")
 async def read_root():
@@ -242,8 +289,14 @@ def is_valid_date_format(date_string):
 @app.get("/predict/{date}")
 async def predict(date: str):
     if (is_valid_date_format(date)):
-        features, predictions = predict(date)
-        return {"features": features, "predictions": predictions}
+        X0, predHigh, predLow, predOpen, predClose  = predict(date)
+        new_row = {'Date': date, 'btcHigh':predHigh, 'btcLow':predLow, 'btcOpen':predOpen, 'btcClose':predClose }
+        X0.drop(X0.index[-1], inplace=True)
+        index = len(X0)
+        X0.loc[index] = new_row
+        X0.fillna(X0.mean(), inplace=True)
+        X0.tail(15)
+        return {"predictions": X0}
     else:
         return {"Validation": "Invalid Date format. Expected YYYY-MM-DD!"} 
 
