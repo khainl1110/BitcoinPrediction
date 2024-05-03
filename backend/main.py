@@ -10,6 +10,7 @@ import random
 import re
 from typing import Union
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()
