@@ -275,13 +275,22 @@ class Predictor:
         model = LinearRegression()
         model.fit(X_train_btcClose, y_train_btcClose)
         y_pred_btcClose = model.predict(X_train_btcClose)
+
+        y_pred_btcHigh = pd.DataFrame(y_pred_btcHigh)
+        y_pred_btcLow = pd.DataFrame(y_pred_btcLow)
+        y_pred_btcOpen = pd.DataFrame(y_pred_btcOpen)
+        y_pred_btcClose = pd.DataFrame(y_pred_btcClose)
         
         self.y_btcHigh_pred = y_pred_btcHigh 
         self.x_btcHigh_train = X_train_btcHigh 
         self.y_btcHigh_train = y_train_btcHigh 
         
-        return self.X.tail(15), y_pred_btcHigh[-1], y_pred_btcLow[-1], y_pred_btcOpen[-1], y_pred_btcClose[-1]
+        y_pred_btcHigh_ = y_pred_btcHigh.iloc[-1:].iloc[-1:].values.flatten()
+        y_pred_btcLow_ = y_pred_btcLow.iloc[-1:].iloc[-1:].values.flatten()
+        y_pred_btcOpen_ = y_pred_btcOpen.iloc[-1:].iloc[-1:].values.flatten()
+        y_pred_btcClose_ = y_pred_btcClose.iloc[-1:].iloc[-1:].values.flatten()
         
+        return self.X.tail(15), y_pred_btcHigh_[0], y_pred_btcLow_[0], y_pred_btcOpen_[0],y_pred_btcClose_[0]
         
 
 @app.get("/greetings")
