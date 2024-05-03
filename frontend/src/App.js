@@ -90,8 +90,6 @@ function App() {
     }
   };
 
-
-
   let dataArrayOpen = [];
   let dataArrayClose = [];
   let dataArrayDate = [];
