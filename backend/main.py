@@ -305,11 +305,11 @@ def is_valid_date_format(date_string):
 async def predict(date: str):
     if (is_valid_date_format(date)):
         X0, predHigh, predLow, predOpen, predClose = predict(date)
-        new_row = {'Date': date, 'btcHigh':predHigh, 'btcLow':predLow, 'btcOpen':predOpen, 'btcClose':predClose }
-        X0.drop(X0.index[-1], inplace=True)
-        index = len(X0)
-        X0.loc[index] = new_row
-        X0.fillna(X0.mean(), inplace=True)
+        #new_row = {'Date': date, 'btcHigh':predHigh, 'btcLow':predLow, 'btcOpen':predOpen, 'btcClose':predClose }
+        #X0.drop(X0.index[-1], inplace=True)
+        #index = len(X0)
+        #X0.loc[index] = new_row
+        #X0.fillna(X0.mean(), inplace=True)
         return {"Predictions": X0.tail(15)}
     else:
         return {"Validation": "Invalid Date format. Expected YYYY-MM-DD!"} 
