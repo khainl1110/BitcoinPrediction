@@ -33,7 +33,7 @@ def read_item(item_id: int, q: Union[str, None] = None):
 
 
 class LinearRegressionRegularization:
-    def __init__(self, max_iter=6,  learningRate=90, random_state=None):
+    def __init__(self, max_iter=3,  learningRate=90, random_state=None):
         self.max_iter_ = max_iter
         self.alpha = learningRate
         self.random_state_ = random_state
@@ -222,6 +222,8 @@ class Predictor:
         return Predictor.X_.tail(15), Predictor.X_.tail(15)
     
     
+
+
     def _predictWithLinearRegression(self, date=None):
     
         model = LinearRegressionRegularization()
@@ -247,34 +249,7 @@ class Predictor:
         #    print ("Training Data contains Nan values, ", has_nan)
         pd.options.mode.chained_assignment = None  #Hide warning
         X_train_btcHigh["Date"] = utils._updateDate(X_train_btcHigh)
-    
-         # Predict High
-        X_train_btcHigh = train_data.drop(columns=['btcHigh'])
-        y_train_btcHigh = train_data['btcHigh']
-        model = LinearRegression()
-        model.fit(X_train_btcHigh, y_train_btcHigh)
-        y_pred_btcHigh = model.predict(X_train_btcHigh)
-        
-        # Predict Low
-        X_train_btcLow = train_data.drop(columns=['btcLow'])
-        y_train_btcLow = train_data['btcLow']
-        model = LinearRegression()
-        model.fit(X_train_btcLow, y_train_btcLow)
-        y_pred_btcLow = model.predict(X_train_btcLow)
-        
-        # Predict Low
-        X_train_btcOpen = train_data.drop(columns=['btcOpen'])
-        y_train_btcOpen = train_data['btcOpen']
-        model = LinearRegression()
-        model.fit(X_train_btcOpen, y_train_btcOpen)
-        y_pred_btcOpen = model.predict(X_train_btcOpen)
-        
-        # Predict Low
-        X_train_btcClose = train_data.drop(columns=['btcClose'])
-        y_train_btcClose = train_data['btcClose']
-        model = LinearRegression()
-        model.fit(X_train_btcClose, y_train_btcClose)
-        y_pred_btcClose = model.predict(X_train_btcClose)
+
         
         return self.X.tail(15), 0.0, 0.0, 0.0, 0.0
         
