@@ -13,6 +13,7 @@ function App() {
   const [dateFourDaysAfter, setDateFourDaysAfter] = useState('');
   const [dateThreeDaysAfter, setDateThreeDaysAfter] = useState('');
   const [dateTwoDaysAfter, setDateTwoDaysAfter] = useState('');
+  const [dateOneDaysAfter, setDateOneDaysAfter] = useState('');
 
   const [data, setData] = useState([]);
   const [featuresDate, setFeaturesDate] = useState([]);
@@ -22,6 +23,13 @@ function App() {
   const [featuresClose, setFeaturesClose] = useState([]);
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading] = useState(true); // State variable to track loading state
+
+  const [todaysDate, setTodaysDate] = useState('');
+
+  useEffect(() => {
+    const formattedDate = new Date().toLocaleDateString('en-US');
+    setTodaysDate(formattedDate);
+  }, []);
 
   const currentDate = new Date();
   // Add one day to the current date
@@ -74,28 +82,32 @@ function App() {
     if (!isNaN(enteredDate.getTime())) {
 
       const sevenDaysAfter = new Date(enteredDate);
-      sevenDaysAfter.setDate(sevenDaysAfter.getDate() + 7);
+      sevenDaysAfter.setDate(sevenDaysAfter.getDate() + 6);
       setDateSevenDaysAfter(sevenDaysAfter.toISOString().split('T')[0]);
 
       const dateSixDaysAfter = new Date(enteredDate);
-      dateSixDaysAfter.setDate(dateSixDaysAfter.getDate() + 6);
+      dateSixDaysAfter.setDate(dateSixDaysAfter.getDate() + 5);
       setDateSixDaysAfter(dateSixDaysAfter.toISOString().split('T')[0]);
 
       const dateFiveDaysAfter = new Date(enteredDate);
-      dateFiveDaysAfter.setDate(dateFiveDaysAfter.getDate() + 5);
+      dateFiveDaysAfter.setDate(dateFiveDaysAfter.getDate() + 4);
       setDateFiveDaysAfter(dateFiveDaysAfter.toISOString().split('T')[0]);
 
       const dateFourDaysAfter = new Date(enteredDate);
-      dateFourDaysAfter.setDate(dateFourDaysAfter.getDate() + 4);
+      dateFourDaysAfter.setDate(dateFourDaysAfter.getDate() + 3);
       setDateFourDaysAfter(dateFourDaysAfter.toISOString().split('T')[0]);
 
       const dateThreeDaysAfter = new Date(enteredDate);
-      dateThreeDaysAfter.setDate(dateThreeDaysAfter.getDate() + 3);
+      dateThreeDaysAfter.setDate(dateThreeDaysAfter.getDate() + 2);
       setDateThreeDaysAfter(dateThreeDaysAfter.toISOString().split('T')[0]);
 
       const dateTwoDaysAfter = new Date(enteredDate);
-      dateTwoDaysAfter.setDate(sevenDaysAfter.getDate() + 2);
+      dateTwoDaysAfter.setDate(dateTwoDaysAfter.getDate() + 1);
       setDateTwoDaysAfter(dateTwoDaysAfter.toISOString().split('T')[0]);
+
+      const dateOneDaysAfter = new Date(enteredDate);
+      dateOneDaysAfter.setDate(dateOneDaysAfter.getDate() + 0);
+      setDateOneDaysAfter(dateOneDaysAfter.toISOString().split('T')[0]);
 
     } else {
       // Clear the calculated date if the entered value is not a valid date
@@ -105,60 +117,34 @@ function App() {
       setDateFourDaysAfter('');
       setDateThreeDaysAfter('');
       setDateTwoDaysAfter('');
+      setDateOneDaysAfter('');
     }
   };
-
 
   const fetchData = async () => {
     setLoading(true); // Set loading to true before making the request
-    //https://api.coindesk.com/v1/bpi/currentprice.json
-    //http://18.116.42.185/predict/${tomorrowFormatted}
-    const fetchUrls = [
-      fetch(`http://18.116.42.185/predict/${dateTwoDaysAfter}`),
-      fetch(`http://18.116.42.185/predict/${dateThreeDaysAfter}`),
-      fetch(`http://18.116.42.185/predict/${dateFourDaysAfter}`),
-      fetch(`http://18.116.42.185/predict/${dateFiveDaysAfter}`),
-      fetch(`http://18.116.42.185/predict/${dateSixDaysAfter}`),
-      fetch(`http://18.116.42.185/predict/${dateSevenDaysAfter}`),
-    ];
-
     try {
-      const responses = await Promise.all(fetchUrls.map(url => fetch(url))); // Fetch all URLs concurrently
-
-      // Parse JSON responses and process data
-      const data = await Promise.all(responses.map(async response => {
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
-        }
-        return await response.json(); // Parse JSON response
-      }));
-
-      // Set features data
-      const featuresDate = data.map(features => features.Date);
-      const featuresHigh = data.map(features => features.btcHigh);
-      // Set other features data similarly...
-
-      // Update state with features data
-      setFeaturesDate(featuresDate);
-      setFeaturesHigh(featuresHigh);
-
-      // Fetch all URLs concurrently
-      //const data = await Promise.all(responses.map(response => handleResponse(response))); // Parse JSON responses
-
-      // Process data...
-      console.log(responses)
+      const response = await fetch(`http://18.116.42.185/predict/${dateOneDaysAfter}/${dateTwoDaysAfter}/${dateThreeDaysAfter}/${dateFourDaysAfter}/${dateFiveDaysAfter}/${dateSixDaysAfter}/${dateSevenDaysAfter}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch data');
+          }
+          return response.json(); // Parse JSON response
+        })
+        .then(data => {
+          setFeaturesDate(data.predictions.Date)
+          setFeaturesHigh(data.predictions.btcHigh)
+          setFeaturesLow(data.predictions.btcLow)
+          setFeaturesOpen(data.predictions.btcOpen)
+          setFeaturesClose(data.predictions.btcClose)
+          setData(data); // Set the data in state
+        })
     } catch (error) {
-      console.error(error);
-      setLoading(false);
+      // Handle any errors that occur during the request
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false); // Set loading to false after the request completes
     }
-  };
-
-  const handleResponse = async (response) => {
-    if (!response.ok) {
-      throw new Error('Failed to fetch data');
-    }
-    const responseData = await response.json(); // Parse JSON response
-    return responseData;
   };
 
   let dataArrayOpen = [];
@@ -192,7 +178,6 @@ function App() {
     if (featuresLow != null || featuresLow != undefined) {
       dataArrayLow = Object.entries(featuresLow).map(([key, value]) => value);
     }
-    dataArrayDate.push(tomorrowFormatted);
     reverseDataArrayOpen = dataArrayOpen.reverse();
     reverseDataArrayClose = dataArrayClose.reverse();
     reverseDataArrayDate = dataArrayDate.reverse();
@@ -226,11 +211,11 @@ function App() {
   return (
     <div className="App">
       <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', backgroundColor: '#FCCB00' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column'}}>
           <h2>Bitcoin Price Predictor</h2>
           <p>Choose a starting date to predict the price of Bitcoin over the next seven days.</p>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'row',alignItems: 'center'}}>
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             <div>
               <text>Start Date: </text>
@@ -246,7 +231,6 @@ function App() {
         <div style={{ alignContent: 'center', }}>
           <button onClick={() => fetchData()}>Predict</button>
         </div>
-
       </div>
 
       <div style={{ display: 'flex', border: '1px solid black', justifyContent: 'center' }}>
