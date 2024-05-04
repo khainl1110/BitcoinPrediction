@@ -14,7 +14,6 @@ function App() {
   const [dateThreeDaysBefore, setDateThreeDaysBefore] = useState('');
   const [dateTwoDaysBefore, setDateTwoDaysBefore] = useState('');
 
-
   const [data, setData] = useState([]);
   const [featuresDate, setFeaturesDate] = useState([]);
   const [featuresHigh, setFeaturesHigh] = useState([]);
@@ -66,92 +65,8 @@ function App() {
   const tomorrowFormatted = `${tomorrowYear}-${tomorrowMonth}-${tomorrowDay}`;
   const towDayFormatted = `${twoDayYear}-${twoDayMonth}-${twoDayDay}`;
 
-  // console.log(tomorrowFormatted)
-
-
-  console.log("here")
-
-  const fetchData = async () => {
-    setLoading(true); // Set loading to true before making the request
-    //https://api.coindesk.com/v1/bpi/currentprice.json
-    //http://18.116.42.185/predict/${tomorrowFormatted}
-    try {
-      const response = await fetch(`http://18.116.42.185/predict/${dateSixDaysBefore}`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
-        }
-        return response.json(); // Parse JSON response
-      })
-        .then(data => {
-          setFeaturesDate(data.predictions.Date)
-          setFeaturesHigh(data.predictions.btcHigh)
-          setFeaturesLow(data.predictions.btcLow)
-          setFeaturesOpen(data.predictions.btcOpen)
-          setFeaturesClose(data.predictions.btcClose)
-          console.log(data.predictions.Date)
-          setData(data); // Set the data in state
-        })
-    } catch (error) {
-      // Handle any errors that occur during the request
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false); // Set loading to false after the request completes
-    }
-  };
- 
-  let dataArrayOpen = [];
-  let dataArrayClose = [];
-  let dataArrayDate = [];
-  let dataArrayHigh = [];
-  let dataArrayLow = [];
-
-  // Check if data has a value
-  const hasData = predictions !== null && predictions !== undefined && predictions !== '';
-
-  if (featuresDate.length != 0 && featuresDate != undefined) {
-    console.log("============actual price===============")
-    if (featuresOpen != null || featuresOpen != undefined) {
-      dataArrayOpen = Object.entries(featuresOpen).map(([key, value]) => value);
-    }
-    if (featuresClose != null || featuresClose != undefined) {
-      dataArrayClose = Object.entries(featuresClose).map(([key, value]) => value);
-    }
-    if (featuresDate != null || featuresDate != undefined) {
-      dataArrayDate = Object.entries(featuresDate).map(([key, value]) => value);
-    }
-    if (featuresHigh != null || featuresHigh != undefined) {
-      dataArrayHigh = Object.entries(featuresHigh).map(([key, value]) => value);
-    }
-    if (featuresLow != null || featuresLow != undefined) {
-      dataArrayLow = Object.entries(featuresLow).map(([key, value]) => value);
-    }
-    dataArrayDate.push(tomorrowFormatted);
-    let reverseDataArrayOpen = dataArrayOpen.reverse();
-    let reverseDataArrayClose = dataArrayClose.reverse();
-    let reverseDataArrayDate = dataArrayDate.reverse();
-    let reverseDataArrayHigh = dataArrayHigh.reverse();
-    let reverseDataArrayLow = dataArrayLow.reverse();
-    console.log(dataArrayOpen);
-    console.log(dataArrayClose);
-    console.log(dataArrayDate);
-    //DO NOTHING
-  } else {
-    console.log("============actual price not null===============")
-    console.log(dataArrayOpen)
-  }
-  const renderItem = ({ item }) => (
-    <div style={{ padding: '10px', borderBottom: '1px solid black' }}>
-      <p>{item}</p>
-    </div>
-  );
-  const renderHeader = (header) => (
-    <div style={{ padding: '10px', fontWeight: 'bold', borderBottom: '1px solid black' }}>
-      <p>{header}</p>
-    </div>
-  );
-  // Event handler to update the input value
-  const handleInputChange = (event) => {
+   // Event handler to update the input value
+   const handleInputChange = (event) => {
     const value = event.target.value;
     setInputValue(value);
     // Calculate the date 7 days before if the entered value is a valid date
@@ -192,6 +107,92 @@ function App() {
       setDateTwoDaysBefore('');
     }
   };
+
+  const fetchData = async () => {
+    setLoading(true); // Set loading to true before making the request
+    //https://api.coindesk.com/v1/bpi/currentprice.json
+    //http://18.116.42.185/predict/${tomorrowFormatted}
+    try {
+      const response = await fetch(`http://18.116.42.185/predict/${dateSixDaysBefore}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        return response.json(); // Parse JSON response
+      })
+        .then(data => {
+          setFeaturesDate(data.predictions.Date)
+          setFeaturesHigh(data.predictions.btcHigh)
+          setFeaturesLow(data.predictions.btcLow)
+          setFeaturesOpen(data.predictions.btcOpen)
+          setFeaturesClose(data.predictions.btcClose)
+          console.log(data.predictions.Date)
+          setData(data); // Set the data in state
+        })
+    } catch (error) {
+      // Handle any errors that occur during the request
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false); // Set loading to false after the request completes
+    }
+  };
+ 
+  let dataArrayOpen = [];
+  let dataArrayClose = [];
+  let dataArrayDate = [];
+  let dataArrayHigh = [];
+  let dataArrayLow = [];
+  let reverseDataArrayOpen = [];
+  let reverseDataArrayClose = [];
+  let reverseDataArrayDate = [];
+  let reverseDataArrayHigh = [];
+  let reverseDataArrayLow = [];
+
+  // Check if data has a value
+  const hasData = predictions !== null && predictions !== undefined && predictions !== '';
+
+  if (featuresDate.length != 0 && featuresDate != undefined) {
+    console.log("============actual price===============")
+    if (featuresOpen != null || featuresOpen != undefined) {
+      dataArrayOpen = Object.entries(featuresOpen).map(([key, value]) => value);
+    }
+    if (featuresClose != null || featuresClose != undefined) {
+      dataArrayClose = Object.entries(featuresClose).map(([key, value]) => value);
+    }
+    if (featuresDate != null || featuresDate != undefined) {
+      dataArrayDate = Object.entries(featuresDate).map(([key, value]) => value);
+    }
+    if (featuresHigh != null || featuresHigh != undefined) {
+      dataArrayHigh = Object.entries(featuresHigh).map(([key, value]) => value);
+    }
+    if (featuresLow != null || featuresLow != undefined) {
+      dataArrayLow = Object.entries(featuresLow).map(([key, value]) => value);
+    }
+    dataArrayDate.push(tomorrowFormatted);
+    reverseDataArrayOpen = dataArrayOpen.reverse();
+    reverseDataArrayClose = dataArrayClose.reverse();
+    reverseDataArrayDate = dataArrayDate.reverse();
+    reverseDataArrayHigh = dataArrayHigh.reverse();
+    reverseDataArrayLow = dataArrayLow.reverse();
+    console.log(dataArrayOpen);
+    console.log(dataArrayClose);
+    console.log(dataArrayDate);
+    //DO NOTHING
+  } else {
+    console.log("============actual price not null===============")
+    console.log(dataArrayOpen)
+  }
+  const renderItem = ({ item }) => (
+    <div style={{ padding: '10px', borderBottom: '1px solid black' }}>
+      <p>{item}</p>
+    </div>
+  );
+  const renderHeader = (header) => (
+    <div style={{ padding: '10px', fontWeight: 'bold', borderBottom: '1px solid black' }}>
+      <p>{header}</p>
+    </div>
+  );
+ 
   return (
     <div className="App">
       <div>
@@ -216,7 +217,7 @@ function App() {
       <div style={{ display: 'flex', }}>
         <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
           {renderHeader('Date')}
-          {dataArrayDate.map(item => (
+          {reverseDataArrayDate.map(item => (
             <li key={item.id}>
               {renderItem({ item })}
             </li>
@@ -224,7 +225,7 @@ function App() {
         </ul>
         <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
           {renderHeader('Open')}
-          {dataArrayOpen.map(item => (
+          {reverseDataArrayOpen.map(item => (
             <li key={item.id}>
               {renderItem({ item })}
             </li>
@@ -232,7 +233,7 @@ function App() {
         </ul>
         <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
           {renderHeader('Close')}
-          {dataArrayClose.map(item => (
+          {reverseDataArrayClose.map(item => (
             <li key={item.id}>
               {renderItem({ item })}
             </li>
@@ -240,7 +241,7 @@ function App() {
         </ul>
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {renderHeader('High')}
-          {dataArrayHigh.map(item => (
+          {reverseDataArrayHigh.map(item => (
             <li key={item.id}>
               {renderItem({ item })}
             </li>
@@ -248,7 +249,7 @@ function App() {
         </ul>
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {renderHeader('Low')}
-          {dataArrayLow.map(item => (
+          {reverseDataArrayLow.map(item => (
             <li key={item.id}>
               {renderItem({ item })}
             </li>
