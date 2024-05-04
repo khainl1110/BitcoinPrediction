@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
+import axios from 'axios';
 import { StyleSheet, Text, View, Button, Image, ScrollView, FlatList } from 'react-native';
 //import { StyleSheet, Text, View, Button, Image, ScrollView, FlatList } from 'react-native-web';
 import FilterButton from '../components/FilterButton';
@@ -66,45 +67,20 @@ function PredictorScreen({ navigation }) {
 
     // Format the date as "YYYY-MM-DD"
     const tomorrowFormatted = `${tomorrowYear}-${tomorrowMonth}-${tomorrowDay}`;
-    const towDayFormatted = `${twoDayYear}-${twoDayMonth}-${twoDayDay}`;
+    const twoDayFormatted = `${twoDayYear}-${twoDayMonth}-${twoDayDay}`;
 
     // console.log(tomorrowFormatted)
 
     useEffect(() => {
-        // Create an Apisauce client
-        const api = create({
-            baseURL: 'http://18.116.42.185/', // Replace with your API base URL
-        });
-        // Define a function to fetch data
-        const fetchData = async () => {
-            setLoading(true); // Set loading to true before making the request
-            try {
-                // Make a GET request using Apisauce
-                const response = await api.get(`predict/${tomorrowFormatted}`);
-                // Check if response is successful
-                if (response.ok) {
-                    // Extract the data from the response
-                    setFeaturesDate(response.data.features.Date)
-                    setFeaturesHigh(response.data.features.btcHigh)
-                    setFeaturesLow(response.data.features.btcLow)
-                    setFeaturesOpen(response.data.features.btcOpen)
-                    setFeaturesClose(response.data.features.btcClose)
-                    setPredictions(response.data.predictions)
-
-                } else {
-                    // Handle unsuccessful response
-                    console.error('Failed to fetch data:', response.problem);
-                }
-            } catch (error) {
-                // Handle any errors that occur during the request
-                console.error('Error fetching data:', error);
-            } finally {
-                setLoading(false); // Set loading to false after the request completes
-            }
-        };
-        //fetchData();
-
-    }, []); // Empty dependency array means this effect runs only once, on mount
+        console.log('before')
+        fetch('http://18.116.42.185/predict/2024-05-02')
+        .then(data => data.json())
+        .then(data => {
+            // data can be done anything in here
+            console.log(data)
+        })
+        
+    }, [])
 
     /*const displayArrayAsRows = (allPredictedPrice) => {
         return allPredictedPrice.map((item, index) => (
@@ -257,7 +233,7 @@ function PredictorScreen({ navigation }) {
                     <Text style={{ fontSize: 32 }}>Loading...</Text>
                 )}
                 
-            </View>
+            </View> 
         </View>
 
     );
@@ -266,7 +242,7 @@ const styles = StyleSheet.create({
     header: {
         alignSelf: 'center',
         width: '100%',
-        height: '15%',
+        height: '50%',
         backgroundColor: '#FCCB00',
         justifyContent: 'space-between',
         flexDirection: 'row'
