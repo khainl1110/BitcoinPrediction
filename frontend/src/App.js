@@ -7,12 +7,12 @@ function App() {
 
   // State to store the input value
   const [inputValue, setInputValue] = useState('');
-  const [dateSevenDaysBefore, setDateSevenDaysBefore] = useState('');
-  const [dateSixDaysBefore, setDateSixDaysBefore] = useState('');
-  const [dateFiveDaysBefore, setDateFiveDaysBefore] = useState('');
-  const [dateFourDaysBefore, setDateFourDaysBefore] = useState('');
-  const [dateThreeDaysBefore, setDateThreeDaysBefore] = useState('');
-  const [dateTwoDaysBefore, setDateTwoDaysBefore] = useState('');
+  const [dateSevenDaysAfter, setDateSevenDaysAfter] = useState('');
+  const [dateSixDaysAfter, setDateSixDaysAfter] = useState('');
+  const [dateFiveDaysAfter, setDateFiveDaysAfter] = useState('');
+  const [dateFourDaysAfter, setDateFourDaysAfter] = useState('');
+  const [dateThreeDaysAfter, setDateThreeDaysAfter] = useState('');
+  const [dateTwoDaysAfter, setDateTwoDaysAfter] = useState('');
 
   const [data, setData] = useState([]);
   const [featuresDate, setFeaturesDate] = useState([]);
@@ -65,78 +65,102 @@ function App() {
   const tomorrowFormatted = `${tomorrowYear}-${tomorrowMonth}-${tomorrowDay}`;
   const towDayFormatted = `${twoDayYear}-${twoDayMonth}-${twoDayDay}`;
 
-   // Event handler to update the input value
-   const handleInputChange = (event) => {
+  // Event handler to update the input value
+  const handleInputChange = (event) => {
     const value = event.target.value;
     setInputValue(value);
     // Calculate the date 7 days before if the entered value is a valid date
     const enteredDate = new Date(value);
     if (!isNaN(enteredDate.getTime())) {
 
-      const sevenDaysBefore = new Date(enteredDate);
-      sevenDaysBefore.setDate(sevenDaysBefore.getDate() - 7);
-      setDateSevenDaysBefore(sevenDaysBefore.toISOString().split('T')[0]);
+      const sevenDaysAfter = new Date(enteredDate);
+      sevenDaysAfter.setDate(sevenDaysAfter.getDate() + 7);
+      setDateSevenDaysAfter(sevenDaysAfter.toISOString().split('T')[0]);
 
-      const dateSixDaysBefore = new Date(enteredDate);
-      dateSixDaysBefore.setDate(dateSixDaysBefore.getDate() - 6);
-      setDateSixDaysBefore(dateSixDaysBefore.toISOString().split('T')[0]);
+      const dateSixDaysAfter = new Date(enteredDate);
+      dateSixDaysAfter.setDate(dateSixDaysAfter.getDate() + 6);
+      setDateSixDaysAfter(dateSixDaysAfter.toISOString().split('T')[0]);
 
-      const dateFiveDaysBefore = new Date(enteredDate);
-      dateFiveDaysBefore.setDate(dateFiveDaysBefore.getDate() - 5);
-      setDateFiveDaysBefore(dateFiveDaysBefore.toISOString().split('T')[0]);
+      const dateFiveDaysAfter = new Date(enteredDate);
+      dateFiveDaysAfter.setDate(dateFiveDaysAfter.getDate() + 5);
+      setDateFiveDaysAfter(dateFiveDaysAfter.toISOString().split('T')[0]);
 
-      const dateFourDaysBefore = new Date(enteredDate);
-      dateFourDaysBefore.setDate(dateFourDaysBefore.getDate() - 4);
-      setDateFourDaysBefore(dateFourDaysBefore.toISOString().split('T')[0]);
+      const dateFourDaysAfter = new Date(enteredDate);
+      dateFourDaysAfter.setDate(dateFourDaysAfter.getDate() + 4);
+      setDateFourDaysAfter(dateFourDaysAfter.toISOString().split('T')[0]);
 
-      const dateThreeDaysBefore = new Date(enteredDate);
-      dateThreeDaysBefore.setDate(dateThreeDaysBefore.getDate() - 3);
-      setDateThreeDaysBefore(dateThreeDaysBefore.toISOString().split('T')[0]);
+      const dateThreeDaysAfter = new Date(enteredDate);
+      dateThreeDaysAfter.setDate(dateThreeDaysAfter.getDate() + 3);
+      setDateThreeDaysAfter(dateThreeDaysAfter.toISOString().split('T')[0]);
 
-      const dateTwoDaysBefore = new Date(enteredDate);
-      dateTwoDaysBefore.setDate(sevenDaysBefore.getDate() - 2);
-      setDateTwoDaysBefore(dateTwoDaysBefore.toISOString().split('T')[0]);
+      const dateTwoDaysAfter = new Date(enteredDate);
+      dateTwoDaysAfter.setDate(sevenDaysAfter.getDate() + 2);
+      setDateTwoDaysAfter(dateTwoDaysAfter.toISOString().split('T')[0]);
 
     } else {
       // Clear the calculated date if the entered value is not a valid date
-      setDateSevenDaysBefore('');
-      setDateSixDaysBefore('');
-      setDateFiveDaysBefore('');
-      setDateFourDaysBefore('');
-      setDateThreeDaysBefore('');
-      setDateTwoDaysBefore('');
+      setDateSevenDaysAfter('');
+      setDateSixDaysAfter('');
+      setDateFiveDaysAfter('');
+      setDateFourDaysAfter('');
+      setDateThreeDaysAfter('');
+      setDateTwoDaysAfter('');
     }
   };
+
 
   const fetchData = async () => {
     setLoading(true); // Set loading to true before making the request
     //https://api.coindesk.com/v1/bpi/currentprice.json
     //http://18.116.42.185/predict/${tomorrowFormatted}
+    const fetchUrls = [
+      fetch(`http://18.116.42.185/predict/${dateTwoDaysAfter}`),
+      fetch(`http://18.116.42.185/predict/${dateThreeDaysAfter}`),
+      fetch(`http://18.116.42.185/predict/${dateFourDaysAfter}`),
+      fetch(`http://18.116.42.185/predict/${dateFiveDaysAfter}`),
+      fetch(`http://18.116.42.185/predict/${dateSixDaysAfter}`),
+      fetch(`http://18.116.42.185/predict/${dateSevenDaysAfter}`),
+    ];
+
     try {
-      const response = await fetch(`http://18.116.42.185/predict/${dateSixDaysBefore}`)
-      .then(response => {
+      const responses = await Promise.all(fetchUrls.map(url => fetch(url))); // Fetch all URLs concurrently
+
+      // Parse JSON responses and process data
+      const data = await Promise.all(responses.map(async response => {
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
-        return response.json(); // Parse JSON response
-      })
-        .then(data => {
-          setFeaturesDate(data.predictions.Date)
-          setFeaturesHigh(data.predictions.btcHigh)
-          setFeaturesLow(data.predictions.btcLow)
-          setFeaturesOpen(data.predictions.btcOpen)
-          setFeaturesClose(data.predictions.btcClose)
-          console.log(data.predictions.Date)
-          setData(data); // Set the data in state
-        })
+        return await response.json(); // Parse JSON response
+      }));
+
+      // Set features data
+      const featuresDate = data.map(features => features.Date);
+      const featuresHigh = data.map(features => features.btcHigh);
+      // Set other features data similarly...
+
+      // Update state with features data
+      setFeaturesDate(featuresDate);
+      setFeaturesHigh(featuresHigh);
+
+      // Fetch all URLs concurrently
+      //const data = await Promise.all(responses.map(response => handleResponse(response))); // Parse JSON responses
+
+      // Process data...
+      console.log(responses)
     } catch (error) {
-      // Handle any errors that occur during the request
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false); // Set loading to false after the request completes
+      console.error(error);
+      setLoading(false);
     }
   };
- 
+
+  const handleResponse = async (response) => {
+    if (!response.ok) {
+      throw new Error('Failed to fetch data');
+    }
+    const responseData = await response.json(); // Parse JSON response
+    return responseData;
+  };
+
   let dataArrayOpen = [];
   let dataArrayClose = [];
   let dataArrayDate = [];
@@ -174,9 +198,9 @@ function App() {
     reverseDataArrayDate = dataArrayDate.reverse();
     reverseDataArrayHigh = dataArrayHigh.reverse();
     reverseDataArrayLow = dataArrayLow.reverse();
-    console.log(dataArrayOpen);
-    console.log(dataArrayClose);
-    console.log(dataArrayDate);
+    console.log(reverseDataArrayOpen);
+    console.log(reverseDataArrayClose);
+    console.log(reverseDataArrayDate);
     //DO NOTHING
   } else {
     console.log("============actual price not null===============")
@@ -188,75 +212,91 @@ function App() {
     </div>
   );
   const renderHeader = (header) => (
-    <div style={{ padding: '10px', fontWeight: 'bold', borderBottom: '1px solid black' }}>
+    <div style={{ padding: '10px', fontWeight: 'bold', borderBottom: '1px solid black', backgroundColor: "#DBDBDB" }}>
       <p>{header}</p>
     </div>
   );
- 
+  const rowStyle = {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end'
+  }
+
   return (
     <div className="App">
-      <div>
-        <h2>Bitcoin Price Predictor:</h2>
+      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', backgroundColor: '#FCCB00' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start', flexDirection: 'column' }}>
+          <h2>Bitcoin Price Predictor</h2>
+          <p>Choose a starting date to predict the price of Bitcoin over the next seven days.</p>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'row' }}>
+            <div>
+              <text>Start Date: </text>
+              <input
+                type="date"
+                value={inputValue}
+                onChange={handleInputChange}
+                placeholder="YYYY-MM-DD"
+              />
+            </div>
+          </div>
+        </div>
+        <div style={{ alignContent: 'center', }}>
+          <button onClick={() => fetchData()}>Predict</button>
+        </div>
 
-        {/* Input field with date type */}
-        <input
-          type="date"
-          value={inputValue}
-          onChange={handleInputChange}
-          placeholder="YYYY-MM-DD"
-        />
-        {/* Display the calculated date 7 days before */}
-        {dateSevenDaysBefore && (
-          <p>Date 7 days before: {dateSevenDaysBefore}</p>
-        )}
-          {dateSixDaysBefore && (
-          <p>Date 6 days before: {dateSixDaysBefore}</p>
-        )}
       </div>
 
-      <div style={{ display: 'flex', }}>
+      <div style={{ display: 'flex', border: '1px solid black', justifyContent: 'center' }}>
         <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
           {renderHeader('Date')}
-          {reverseDataArrayDate.map(item => (
-            <li key={item.id}>
+          {dataArrayDate.map((item, index) => ( // Include index parameter
+            <li key={item.id} style={rowStyle}>
+              <span style={{ padding: '10px', fontWeight: 'bold' }}>{index}</span> {/* Display the index count */}
               {renderItem({ item })}
             </li>
           ))}
         </ul>
         <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
           {renderHeader('Open')}
-          {reverseDataArrayOpen.map(item => (
-            <li key={item.id}>
+          {dataArrayOpen.map(item => (
+            <li key={item.id} style={rowStyle}>
+              <span>$</span>
               {renderItem({ item })}
             </li>
           ))}
         </ul>
         <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
           {renderHeader('Close')}
-          {reverseDataArrayClose.map(item => (
-            <li key={item.id}>
+          {dataArrayClose.map(item => (
+            <li key={item.id} style={rowStyle}>
+              <span>$</span>
               {renderItem({ item })}
             </li>
           ))}
         </ul>
-        <ul style={{ listStyle: 'none', padding: 0 }}>
+        <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
           {renderHeader('High')}
-          {reverseDataArrayHigh.map(item => (
-            <li key={item.id}>
+          {dataArrayHigh.map(item => (
+            <li key={item.id} style={rowStyle}>
+              <span>$</span> {/* Display the item with "$" symbol */}
               {renderItem({ item })}
             </li>
           ))}
         </ul>
-        <ul style={{ listStyle: 'none', padding: 0 }}>
+        <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
           {renderHeader('Low')}
           {reverseDataArrayLow.map(item => (
-            <li key={item.id}>
+            <li key={item.id} style={rowStyle}>
+              <span>$</span>
               {renderItem({ item })}
             </li>
           ))}
         </ul>
       </div>
-      <button onClick={() => fetchData()}>Add Item</button>
+
     </div>
   );
 }

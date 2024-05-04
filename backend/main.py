@@ -21,10 +21,10 @@ app = FastAPI()
 # Allow requests from all origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Allow requests from any origin
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["DNT", "User-Agent", "X-Requested-With", "If-Modified-Since", "Cache-Control", "Content-Type", "Range"],
 )
 
 @app.get("/")
@@ -306,37 +306,40 @@ def is_valid_date_format(date_string):
     date_regex = r'^\d{4}-\d{2}-\d{2}$'
     return bool(re.match(date_regex, date_string))
 
-@app.get("/predict/{date}")
-async def predict(date: str):
+@app.get("/predict/{date1}/{date2}/{date3}/{date4}/{date5}/{date6}/{date7}")
+async def predict(date1: str, date2: str, date3: str, date4: str, date5: str, date6: str, date7: str):
     global global_var
     global index
-    if is_valid_date_format(date):
-        X0, predHigh, predLow, predOpen, predClose = predict(date)
-        if global_var is None:
-            global_var = X0.tail(15)
-       
-        X0, predHigh, predLow, predOpen, predClose  = predict(date)
-        new_row = {'Date': date, 'btcHigh':predHigh, 'btcLow':predLow, 'btcOpen':predOpen, 'btcClose':predClose }
-        if (index == 0):
-            global_var.drop(global_var.index[-1], inplace=True)
-            columns_to_keep = ['Date', 'btcHigh', 'btcLow', 'btcOpen', 'btcClose']  # Specify the columns you want to keep
-            columns_to_drop = [col for col in X0.columns if col not in columns_to_keep]
-            global_var.drop(columns=columns_to_drop, inplace=True)
-            index += 1
+    dates = [date1, date2, date3, date4, date5, date6, date7]
+    columns_to_keep = ['Date', 'btcHigh', 'btcLow', 'btcOpen', 'btcClose']    # Specify the columns you want to keep
+    for date in dates:
+        if is_valid_date_format(date):
+            X0, predHigh, predLow, predOpen, predClose = predict(date)
+            if global_var is None:
+                global_var = X0.tail()
+        
+            X0, predHigh, predLow, predOpen, predClose  = predict(date)
+            new_row = {'Date': date, 'btcHigh':predHigh, 'btcLow':predLow, 'btcOpen':predOpen, 'btcClose':predClose }
+            if (index == 0):
+                global_var.drop(global_var.index[-1], inplace=True)
+                columns_to_drop = [col for col in X0.columns if col not in columns_to_keep]
+                global_var.drop(columns=columns_to_drop, inplace=True)
+                index += 1
 
-        #global_var = global_var.append(new_row, ignore_index=True)
+            #global_var = global_var.append(new_row, ignore_index=True)
+            i = len(global_var)
+            global_var.loc[i] = new_row
+            #x_train_temp = x_train
+            #for col in global_var.columns:
+            #   global_var.at[global_var.index[-1], col] = new_row[col]
+            global_var.fillna(method='ffill', inplace=True)
+        else:
+            return {"Validation": "Invalid Date format. Expected YYYY-MM-DD!"}
 
-        i = len(global_var)
-        global_var.loc[i] = new_row
-        #x_train_temp = x_train
-        #for col in global_var.columns:
-         #   global_var.at[global_var.index[-1], col] = new_row[col]
-
-        global_var.fillna(method='ffill', inplace=True)
-       
-        return {"predictions": global_var}
-    else:
-        return {"Validation": "Invalid Date format. Expected YYYY-MM-DD!"}
+    for col in columns_to_keep:
+        if pd.api.types.is_numeric_dtype(global_var[col]):
+            global_var[col] = global_var[col].round(2)
+    return {"predictions": global_var.tail(6)}
 
 
 def predict(date):
