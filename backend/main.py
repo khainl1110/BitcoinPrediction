@@ -313,7 +313,7 @@ async def predict(date: str):
     if is_valid_date_format(date):
         X0, predHigh, predLow, predOpen, predClose = predict(date)
         if global_var is None:
-            global_var = X0.tail(7)
+            global_var = X0.tail(15)
        
         X0, predHigh, predLow, predOpen, predClose  = predict(date)
         new_row = {'Date': date, 'btcHigh':predHigh, 'btcLow':predLow, 'btcOpen':predOpen, 'btcClose':predClose }
