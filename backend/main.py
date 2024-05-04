@@ -319,8 +319,19 @@ async def predict(date: str):
         new_row = {'Date': date, 'btcHigh':predHigh, 'btcLow':predLow, 'btcOpen':predOpen, 'btcClose':predClose }
         if (index == 0):
             global_var.drop(global_var.index[-1], inplace=True)
+            columns_to_keep = ['Date', 'btcHigh', 'btcLow', 'btcOpen', 'btcClose']  # Specify the columns you want to keep
+            columns_to_drop = [col for col in X0.columns if col not in columns_to_keep]
+            global_var.drop(columns=columns_to_drop, inplace=True)
             index += 1
-        global_var = global_var.append(new_row, ignore_index=True)
+
+        #global_var = global_var.append(new_row, ignore_index=True)
+
+        i = len(global_var)
+        global_var.loc[i] = new_row
+        #x_train_temp = x_train
+        #for col in global_var.columns:
+         #   global_var.at[global_var.index[-1], col] = new_row[col]
+
         global_var.fillna(method='ffill', inplace=True)
        
         return {"predictions": global_var}
