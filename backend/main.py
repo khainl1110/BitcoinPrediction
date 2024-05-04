@@ -13,6 +13,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sklearn.linear_model import LinearRegression
 
+global_var = None
+dataSamples = None
+index = 0
+
 app = FastAPI()
 # Allow requests from all origins
 app.add_middleware(
@@ -182,14 +186,15 @@ class Utils:
         return y_train_temp
     
 class Predictor: 
+    
     X_ = []
     def __init__(self, X, y):
-        Predictor.X_
         self.X = X
         self.y = y
         self.y_btcHigh_pred = []
         self.x_btcHigh_train = []
         self.y_btcHigh_train = []
+        Predictor.X_ = self.X
         
     def getAllPredictionsBTCHigh(self):
         return self.y_btcHigh_pred
@@ -200,7 +205,26 @@ class Predictor:
     def getAllYTrainBTCHigh(self):
         return self.y_btcHigh_train
     
+    def _predictNextSevenDays(self):
+        today = datetime.now().date()
+        tomorrow = (today + timedelta(days=1)).strftime('%Y-%m-%d')
+        secondDay = (today + timedelta(days=2)).strftime('%Y-%m-%d')
+        threeDay = (today + timedelta(days=3)).strftime('%Y-%m-%d')
+        fourthDay = (today + timedelta(days=4)).strftime('%Y-%m-%d')
+        fifthDay = (today + timedelta(days=5)).strftime('%Y-%m-%d')
+        sixthDay = (today + timedelta(days=6)).strftime('%Y-%m-%d')
+        seventhDay = (today + timedelta(days=7)).strftime('%Y-%m-%d')
+        self._predictWithLinearRegression(tomorrow)
+        self._predictWithLinearRegression(secondDay)
+        self._predictWithLinearRegression(threeDay)
+        self._predictWithLinearRegression(fourthDay)
+        self._predictWithLinearRegression(fifthDay)
+        self._predictWithLinearRegression(sixthDay)
+        self._predictWithLinearRegression(seventhDay)
         
+        return Predictor.X_.tail(15), Predictor.X_.tail(15)
+    
+    
     def _predictWithLinearRegression(self, date=None):
     
         model = LinearRegressionRegularization()
@@ -209,19 +233,27 @@ class Predictor:
         #New training data
         if (date!=None): 
             self.X = utils._newTrainingData({'Date': date}, self.X)
-            Predictor.X_ = self.X.columns
+            Predictor.X_ = self.X
             
         # Split the data into training subsets
         train_data, test_data, = model._split(self.X, self.y, ratio=0.7, random_state=123 )
-    
         X_train_btcHigh = train_data.drop(columns=['btcHigh'])
         y_train_btcHigh = train_data['btcHigh']
-        #
+        #Adjust training data 
         X_train_btcHigh = utils._updateTrainingData(X_train_btcHigh)
         X_train_btcHigh = utils._replaceNanX(X_train_btcHigh)
         has_nan = X_train_btcHigh.isna().any().any()
-        #
-        #Predict
+        #if (has_nan != True):
+            #Predict
+        #    y_pred_btcHigh = model._predict(X_train_btcHigh, y_train_btcHigh)
+        #else:
+        #    print ("Training Data contains Nan values, ", has_nan)
+        pd.options.mode.chained_assignment = None  #Hide warning
+        X_train_btcHigh["Date"] = utils._updateDate(X_train_btcHigh)
+    
+         # Predict High
+        X_train_btcHigh = train_data.drop(columns=['btcHigh'])
+        y_train_btcHigh = train_data['btcHigh']
         model = LinearRegression()
         model.fit(X_train_btcHigh, y_train_btcHigh)
         y_pred_btcHigh = model.predict(X_train_btcHigh)
@@ -229,35 +261,20 @@ class Predictor:
         # Predict Low
         X_train_btcLow = train_data.drop(columns=['btcLow'])
         y_train_btcLow = train_data['btcLow']
-        #
-        X_train_btcLow = utils._updateTrainingData(X_train_btcLow)
-        X_train_btcLow = utils._replaceNanX(X_train_btcLow)
-        has_nan = X_train_btcLow.isna().any().any()
-        #
         model = LinearRegression()
         model.fit(X_train_btcLow, y_train_btcLow)
         y_pred_btcLow = model.predict(X_train_btcLow)
-    
+        
         # Predict Low
         X_train_btcOpen = train_data.drop(columns=['btcOpen'])
         y_train_btcOpen = train_data['btcOpen']
-        #
-        X_train_btcOpen = utils._updateTrainingData(X_train_btcOpen)
-        X_train_btcOpen = utils._replaceNanX(X_train_btcOpen)
-        has_nan = X_train_btcOpen.isna().any().any()
-        #
         model = LinearRegression()
         model.fit(X_train_btcOpen, y_train_btcOpen)
         y_pred_btcOpen = model.predict(X_train_btcOpen)
-
+        
         # Predict Low
         X_train_btcClose = train_data.drop(columns=['btcClose'])
         y_train_btcClose = train_data['btcClose']
-        #
-        X_train_btcClose = utils._updateTrainingData(X_train_btcClose)
-        X_train_btcClose = utils._replaceNanX(X_train_btcClose)
-        has_nan = X_train_btcClose.isna().any().any()
-        #Predict
         model = LinearRegression()
         model.fit(X_train_btcClose, y_train_btcClose)
         y_pred_btcClose = model.predict(X_train_btcClose)
@@ -271,12 +288,14 @@ class Predictor:
         self.x_btcHigh_train = X_train_btcHigh 
         self.y_btcHigh_train = y_train_btcHigh 
         
+        
         y_pred_btcHigh_ = y_pred_btcHigh.iloc[-1:].iloc[-1:].values.flatten()
         y_pred_btcLow_ = y_pred_btcLow.iloc[-1:].iloc[-1:].values.flatten()
         y_pred_btcOpen_ = y_pred_btcOpen.iloc[-1:].iloc[-1:].values.flatten()
         y_pred_btcClose_ = y_pred_btcClose.iloc[-1:].iloc[-1:].values.flatten()
         
         return self.X.tail(15), y_pred_btcHigh_[0], y_pred_btcLow_[0], y_pred_btcOpen_[0],y_pred_btcClose_[0]
+
 
 
 @app.get("/greetings")
@@ -289,20 +308,33 @@ def is_valid_date_format(date_string):
 
 @app.get("/predict/{date}")
 async def predict(date: str):
-    if (is_valid_date_format(date)):
+    global global_var
+    global index
+    if is_valid_date_format(date):
+        X0, predHigh, predLow, predOpen, predClose = predict(date)
+        if global_var is None:
+            global_var = X0.tail(7)
+       
         X0, predHigh, predLow, predOpen, predClose  = predict(date)
-        X0.iloc[-1] = {'Date': date, 'btcHigh': predHigh, 'btcLow': predLow, 'btcOpen': predOpen, 'btcClose': predClose}
-        X0.fillna(method='ffill', inplace=True) 
-        
-        return {"predictions": X0.tail(15)}
+        new_row = {'Date': date, 'btcHigh':predHigh, 'btcLow':predLow, 'btcOpen':predOpen, 'btcClose':predClose }
+        if (index == 0):
+            global_var.drop(global_var.index[-1], inplace=True)
+            index += 1
+        global_var = global_var.append(new_row, ignore_index=True)
+        global_var.fillna(method='ffill', inplace=True)
+       
+        return {"predictions": global_var}
     else:
-        return {"Validation": "Invalid Date format. Expected YYYY-MM-DD!"} 
+        return {"Validation": "Invalid Date format. Expected YYYY-MM-DD!"}
 
 
 def predict(date):
-    dataframe = handleData()
-    X = dataframe
-    y = dataframe['btcHigh']
+    global dataSamples
+    if dataSamples is None:  # Check if dataSamples is None
+        dataSamples = handleData()  # Initialize dataSamples if it's None
+
+    X = dataSamples
+    y = dataSamples['btcHigh']
     predictor = Predictor(X,y)
     predicted_price = predictor._predictWithLinearRegression(date)
     return predicted_price

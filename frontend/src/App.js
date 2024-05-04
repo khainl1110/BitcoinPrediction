@@ -5,6 +5,16 @@ import { create } from 'apisauce';
 
 function App() {
 
+  // State to store the input value
+  const [inputValue, setInputValue] = useState('');
+  const [dateSevenDaysBefore, setDateSevenDaysBefore] = useState('');
+  const [dateSixDaysBefore, setDateSixDaysBefore] = useState('');
+  const [dateFiveDaysBefore, setDateFiveDaysBefore] = useState('');
+  const [dateFourDaysBefore, setDateFourDaysBefore] = useState('');
+  const [dateThreeDaysBefore, setDateThreeDaysBefore] = useState('');
+  const [dateTwoDaysBefore, setDateTwoDaysBefore] = useState('');
+
+
   const [data, setData] = useState([]);
   const [featuresDate, setFeaturesDate] = useState([]);
   const [featuresHigh, setFeaturesHigh] = useState([]);
@@ -66,20 +76,20 @@ function App() {
     //https://api.coindesk.com/v1/bpi/currentprice.json
     //http://18.116.42.185/predict/${tomorrowFormatted}
     try {
-      const response = await fetch(`http://18.116.42.185/predict/${tomorrowFormatted}`).then(response => {
+      const response = await fetch(`http://18.116.42.185/predict/${dateSixDaysBefore}`)
+      .then(response => {
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
         return response.json(); // Parse JSON response
       })
         .then(data => {
-          setFeaturesDate(data.features.Date)
-          setFeaturesHigh(data.features.btcHigh)
-          setFeaturesLow(data.features.btcLow)
-          setFeaturesOpen(data.features.btcOpen)
-          setFeaturesClose(data.features.btcClose)
-          setPredictions(data.predictions)
-          console.log(data.features.Date)
+          setFeaturesDate(data.predictions.Date)
+          setFeaturesHigh(data.predictions.btcHigh)
+          setFeaturesLow(data.predictions.btcLow)
+          setFeaturesOpen(data.predictions.btcOpen)
+          setFeaturesClose(data.predictions.btcClose)
+          console.log(data.predictions.Date)
           setData(data); // Set the data in state
         })
     } catch (error) {
@@ -89,19 +99,17 @@ function App() {
       setLoading(false); // Set loading to false after the request completes
     }
   };
-
+ 
   let dataArrayOpen = [];
   let dataArrayClose = [];
   let dataArrayDate = [];
   let dataArrayHigh = [];
   let dataArrayLow = [];
-  let dataArrayPredictions = [];
 
   // Check if data has a value
   const hasData = predictions !== null && predictions !== undefined && predictions !== '';
 
-
-  if (predictions.length != 0 && predictions != undefined) {
+  if (featuresDate.length != 0 && featuresDate != undefined) {
     console.log("============actual price===============")
     if (featuresOpen != null || featuresOpen != undefined) {
       dataArrayOpen = Object.entries(featuresOpen).map(([key, value]) => value);
@@ -118,16 +126,12 @@ function App() {
     if (featuresLow != null || featuresLow != undefined) {
       dataArrayLow = Object.entries(featuresLow).map(([key, value]) => value);
     }
-    if (predictions != null || predictions != undefined) {
-      dataArrayPredictions = Object.entries(predictions).map(([key, value]) => value);
-    }
     dataArrayDate.push(tomorrowFormatted);
     let reverseDataArrayOpen = dataArrayOpen.reverse();
     let reverseDataArrayClose = dataArrayClose.reverse();
     let reverseDataArrayDate = dataArrayDate.reverse();
     let reverseDataArrayHigh = dataArrayHigh.reverse();
     let reverseDataArrayLow = dataArrayLow.reverse();
-    let reverseDataArrayPredictions = dataArrayPredictions.reverse();
     console.log(dataArrayOpen);
     console.log(dataArrayClose);
     console.log(dataArrayDate);
@@ -137,7 +141,7 @@ function App() {
     console.log(dataArrayOpen)
   }
   const renderItem = ({ item }) => (
-    <div style={{ padding: '10px', borderBottom: '1px solid black'}}>
+    <div style={{ padding: '10px', borderBottom: '1px solid black' }}>
       <p>{item}</p>
     </div>
   );
@@ -146,12 +150,72 @@ function App() {
       <p>{header}</p>
     </div>
   );
+  // Event handler to update the input value
+  const handleInputChange = (event) => {
+    const value = event.target.value;
+    setInputValue(value);
+    // Calculate the date 7 days before if the entered value is a valid date
+    const enteredDate = new Date(value);
+    if (!isNaN(enteredDate.getTime())) {
+
+      const sevenDaysBefore = new Date(enteredDate);
+      sevenDaysBefore.setDate(sevenDaysBefore.getDate() - 7);
+      setDateSevenDaysBefore(sevenDaysBefore.toISOString().split('T')[0]);
+
+      const dateSixDaysBefore = new Date(enteredDate);
+      dateSixDaysBefore.setDate(dateSixDaysBefore.getDate() - 6);
+      setDateSixDaysBefore(dateSixDaysBefore.toISOString().split('T')[0]);
+
+      const dateFiveDaysBefore = new Date(enteredDate);
+      dateFiveDaysBefore.setDate(dateFiveDaysBefore.getDate() - 5);
+      setDateFiveDaysBefore(dateFiveDaysBefore.toISOString().split('T')[0]);
+
+      const dateFourDaysBefore = new Date(enteredDate);
+      dateFourDaysBefore.setDate(dateFourDaysBefore.getDate() - 4);
+      setDateFourDaysBefore(dateFourDaysBefore.toISOString().split('T')[0]);
+
+      const dateThreeDaysBefore = new Date(enteredDate);
+      dateThreeDaysBefore.setDate(dateThreeDaysBefore.getDate() - 3);
+      setDateThreeDaysBefore(dateThreeDaysBefore.toISOString().split('T')[0]);
+
+      const dateTwoDaysBefore = new Date(enteredDate);
+      dateTwoDaysBefore.setDate(sevenDaysBefore.getDate() - 2);
+      setDateTwoDaysBefore(dateTwoDaysBefore.toISOString().split('T')[0]);
+
+    } else {
+      // Clear the calculated date if the entered value is not a valid date
+      setDateSevenDaysBefore('');
+      setDateSixDaysBefore('');
+      setDateFiveDaysBefore('');
+      setDateFourDaysBefore('');
+      setDateThreeDaysBefore('');
+      setDateTwoDaysBefore('');
+    }
+  };
   return (
     <div className="App">
-      <div style={{ display: 'flex',}}>
-        
+      <div>
+        <h2>Bitcoin Price Predictor:</h2>
+
+        {/* Input field with date type */}
+        <input
+          type="date"
+          value={inputValue}
+          onChange={handleInputChange}
+          placeholder="YYYY-MM-DD"
+        />
+        {/* Display the calculated date 7 days before */}
+        {dateSevenDaysBefore && (
+          <p>Date 7 days before: {dateSevenDaysBefore}</p>
+        )}
+          {dateSixDaysBefore && (
+          <p>Date 6 days before: {dateSixDaysBefore}</p>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', }}>
         <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
-        {renderHeader('Date')}
+          {renderHeader('Date')}
           {dataArrayDate.map(item => (
             <li key={item.id}>
               {renderItem({ item })}
@@ -175,7 +239,16 @@ function App() {
           ))}
         </ul>
         <ul style={{ listStyle: 'none', padding: 0 }}>
-          {dataArrayDate.map(item => (
+          {renderHeader('High')}
+          {dataArrayHigh.map(item => (
+            <li key={item.id}>
+              {renderItem({ item })}
+            </li>
+          ))}
+        </ul>
+        <ul style={{ listStyle: 'none', padding: 0 }}>
+          {renderHeader('Low')}
+          {dataArrayLow.map(item => (
             <li key={item.id}>
               {renderItem({ item })}
             </li>
