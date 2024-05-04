@@ -325,7 +325,6 @@ async def predict(date1: str, date2: str, date3: str, date4: str, date5: str, da
                 columns_to_drop = [col for col in X0.columns if col not in columns_to_keep]
                 global_var.drop(columns=columns_to_drop, inplace=True)
                 index += 1
-
             #global_var = global_var.append(new_row, ignore_index=True)
             i = len(global_var)
             global_var.loc[i] = new_row
@@ -339,7 +338,42 @@ async def predict(date1: str, date2: str, date3: str, date4: str, date5: str, da
     for col in columns_to_keep:
         if pd.api.types.is_numeric_dtype(global_var[col]):
             global_var[col] = global_var[col].round(2)
-    return {"predictions": global_var.tail(6)}
+
+    indicator = global_var['btcOpen'].tail(6)
+    indicatorDate = global_var['Date'].tail(6)
+  
+
+    # Assuming global_var['Open'].tail(6) contains the prices at different times
+    prices = global_var['btcOpen'].tail(6).to_dict()
+    dates = global_var['Date'].tail(6).to_dict()
+    insight1 = ""
+    insight2 = ""
+    balance = ""
+
+    balance = 100000 
+    shares = 0     
+    last_price = None
+    bought = False 
+
+    # Iterate over the prices
+    for time, price in sorted(prices.items()):
+        if last_price is not None:
+            if price < last_price and not bought:
+                # Buy using all available balance
+                shares_to_buy = balance / price 
+                shares += shares_to_buy
+                balance -= shares_to_buy * price
+                bought = True
+                insight1 = (f"Date: ({dates[time]}): Bought {shares_to_buy} shares at {price}. Current balance: {balance}")
+            # Check if the price decreased since last time
+            elif price > last_price:
+                # Sell if the price decreased
+                balance += shares * price  # Sell all shares
+                shares = 0
+                insight2 = f"Date: ({dates[time]}): Sold all shares at {price} . Current balance: {balance}"
+        last_price = price
+
+    return {"predictions": global_var.tail(6), "insight1": insight1, "insight2": insight2}
 
 
 def predict(date):

@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "bitcoin_predictor_frontend",
+    "slug": "bitcoin_predictor_frontend",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
