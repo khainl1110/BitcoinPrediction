@@ -373,7 +373,7 @@ async def predict(date1: str, date2: str, date3: str, date4: str, date5: str, da
                 insight2 = f"Date: ({dates[time]}): Sold all shares at {price} . Current balance: {balance}"
         last_price = price
 
-    return {"predictions": global_var.tail(6), "insight1": insight1, "insight2": insight2}
+    return {"predictions": global_var.tail(7), "insight1": insight1, "insight2": insight2}
 
 
 def predict(date):

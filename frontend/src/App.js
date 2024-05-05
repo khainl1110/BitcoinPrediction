@@ -21,6 +21,9 @@ function App() {
   const [featuresLow, setFeaturesLow] = useState([]);
   const [featuresOpen, setFeaturesOpen] = useState([]);
   const [featuresClose, setFeaturesClose] = useState([]);
+  const [insight, setInsight] = useState("");
+  const [insight2, setInsight2] = useState("");
+
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading] = useState(true); // State variable to track loading state
 
@@ -137,6 +140,8 @@ function App() {
           setFeaturesLow(data.predictions.btcLow)
           setFeaturesOpen(data.predictions.btcOpen)
           setFeaturesClose(data.predictions.btcClose)
+          setInsight(data.insight1)
+          setInsight2(data.insight2)
           setData(data); // Set the data in state
         })
     } catch (error) {
@@ -211,11 +216,11 @@ function App() {
   return (
     <div className="App">
       <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', backgroundColor: '#FCCB00' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column'}}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
           <h2>Bitcoin Price Predictor</h2>
           <p>Choose a starting date to predict the price of Bitcoin over the next seven days.</p>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'row',alignItems: 'center'}}>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             <div>
               <text>Start Date: </text>
@@ -233,7 +238,7 @@ function App() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', border: '1px solid black', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', border: '1px solid black', justifyContent: 'center'}}>
         <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
           {renderHeader('Date')}
           {dataArrayDate.map((item, index) => ( // Include index parameter
@@ -278,6 +283,22 @@ function App() {
               {renderItem({ item })}
             </li>
           ))}
+        </ul>
+        <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px', al: 'flext-start', width: '30%'}}>
+            <div style={{ display: 'flex', flexDirection: 'row'}}>
+              <b>Initial Balance: </b>
+              <li> 100000</li>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'row'}}>
+              <b>Insight: </b>
+              <li> {insight}</li>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'row'}}>
+              <b>Insight: </b>
+              <li> {insight2}</li>
+            </div>
+           
+           
         </ul>
       </div>
 
