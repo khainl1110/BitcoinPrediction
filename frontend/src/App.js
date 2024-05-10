@@ -127,7 +127,8 @@ function App() {
   const fetchData = async () => {
     setLoading(true); // Set loading to true before making the request
     try {
-      const response = await fetch(`http://18.116.42.185/predict/${dateOneDaysAfter}/${dateTwoDaysAfter}/${dateThreeDaysAfter}/${dateFourDaysAfter}/${dateFiveDaysAfter}/${dateSixDaysAfter}/${dateSevenDaysAfter}`)
+      // temp = 18.116.42.185
+      const response = await fetch(`http://localhost:8000/predict/${dateOneDaysAfter}/${dateTwoDaysAfter}/${dateThreeDaysAfter}/${dateFourDaysAfter}/${dateFiveDaysAfter}/${dateSixDaysAfter}/${dateSevenDaysAfter}`)
         .then(response => {
           if (!response.ok) {
             throw new Error('Failed to fetch data');
@@ -286,15 +287,14 @@ function App() {
         </ul>
         <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px', al: 'flext-start', width: '30%'}}>
             <div style={{ display: 'flex', flexDirection: 'row'}}>
-              <b>Initial Balance: </b>
-              <li> 100000</li>
+              <b>Recommended swing strategy </b>
             </div>
             <div style={{ display: 'flex', flexDirection: 'row'}}>
-              <b>Insight: </b>
+              <b>Sell All</b>
               <li> {insight}</li>
             </div>
             <div style={{ display: 'flex', flexDirection: 'row'}}>
-              <b>Insight: </b>
+              <b>All In</b>
               <li> {insight2}</li>
             </div>
            

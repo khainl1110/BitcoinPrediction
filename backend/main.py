@@ -346,34 +346,82 @@ async def predict(date1: str, date2: str, date3: str, date4: str, date5: str, da
     # Assuming global_var['Open'].tail(6) contains the prices at different times
     prices = global_var['btcOpen'].tail(6).to_dict()
     dates = global_var['Date'].tail(6).to_dict()
-    insight1 = ""
-    insight2 = ""
-    balance = ""
 
-    balance = 100000 
-    shares = 0     
-    last_price = None
-    bought = False 
+    currentPrice = None
+    highestPrice = 0
+    lowestPrice = 0
+    highestDate = 0
+    lowestDate = 0
+    finalPrice = 0
 
-    # Iterate over the prices
+    counter = 0
+    insight1 = 'NA'
+    insight2 = 'NA'
+
     for time, price in sorted(prices.items()):
-        if last_price is not None:
-            if price < last_price and not bought:
-                # Buy using all available balance
-                shares_to_buy = balance / price 
-                shares += shares_to_buy
-                balance -= shares_to_buy * price
-                bought = True
-                insight1 = (f"Date: ({dates[time]}): Bought {shares_to_buy} shares at {price}. Current balance: {balance}")
-            # Check if the price decreased since last time
-            elif price > last_price:
-                # Sell if the price decreased
-                balance += shares * price  # Sell all shares
-                shares = 0
-                insight2 = f"Date: ({dates[time]}): Sold all shares at {price} . Current balance: {balance}"
-        last_price = price
+        print("test")
+        print(time, price)
+        if counter == 0:
+            currentPrice = price
+            highestPrice = price
+            lowestPrice = price
+            highestDate = time
+            lowestDate = time
+        
+        if price > highestPrice:
+            highestPrice = price
+            highestDate = time
+        if price < lowestPrice:
+            lowestPrice = price
+            lowestDate = time
+        counter += 1
+
+        if counter == 6:
+            finalPrice = price
+
+        if currentPrice > highestPrice:
+            # after 7 days, the highest price is lower than current price
+            insight1 = dates[lowestDate]
+        if currentPrice < lowestPrice or currentPrice < highestPrice:
+            # after 7 days, the price is higher, so do nothing
+            insight1 = 'NA'
+            insight2 = 'NA'
+        if highestDate < lowestDate:
+            if currentPrice <= finalPrice:
+                # sell then buy
+                insight1 = dates[highestDate]
+                insight2 = dates[lowestDate]
+            if currentPrice > finalPrice:
+                # sell then don't buy since the price going down
+                insight1 = dates[highestDate]
+
+                
+
+    # print("test")
+    # print(highestPrice, lowestPrice, highestDate, lowestDate, counter, currentPrice)
 
     return {"predictions": global_var.tail(7), "insight1": insight1, "insight2": insight2}
+
+    # # Iterate over the prices
+    # for time, price in sorted(prices.items()):
+        
+    #     if last_price is not None:
+    #         if price < last_price and not bought:
+    #             # Buy using all available balance
+    #             shares_to_buy = balance / price 
+    #             shares += shares_to_buy
+    #             balance -= shares_to_buy * price
+    #             bought = True
+    #             insight1 = (f"Date: ({dates[time]}): Bought {shares_to_buy} shares at {price}. Current balance: {balance}")
+    #         # Check if the price decreased since last time
+    #         elif price > last_price:
+    #             # Sell if the price decreased
+    #             balance += shares * price  # Sell all shares
+    #             shares = 0
+    #             insight2 = f"Date: ({dates[time]}): Sold all shares at {price} . Current balance: {balance}"
+    #     last_price = price
+
+    # return {"predictions": global_var.tail(7), "insight1": insight1, "insight2": insight2}
 
 
 def predict(date):
