@@ -354,6 +354,7 @@ async def predict(date1: str, date2: str, date3: str, date4: str, date5: str, da
     lowestDate = 0
     finalPrice = 0
 
+    avgPrice = 0
     counter = 0
     insight1 = 'NA'
     insight2 = 'NA'
@@ -372,33 +373,37 @@ async def predict(date1: str, date2: str, date3: str, date4: str, date5: str, da
         if price < lowestPrice:
             lowestPrice = price
             lowestDate = time
+        
         counter += 1
+        avgPrice += price
+        print(price, avgPrice)
 
         if counter == 6:
             finalPrice = price
 
-        if currentPrice > highestPrice:
-            # after 7 days, the highest price is lower than current price
-            insight1 = dates[lowestDate]
-        if currentPrice < lowestPrice or currentPrice < highestPrice:
-            # after 7 days, the price is higher, so do nothing
-            insight1 = 'NA'
-            insight2 = 'NA'
-        if highestDate < lowestDate:
-            if currentPrice <= finalPrice:
-                # sell then buy
-                insight1 = dates[highestDate]
-                insight2 = dates[lowestDate]
-            if currentPrice > finalPrice:
-                # sell then don't buy since the price going down
-                insight1 = dates[highestDate]
+    avgPrice = avgPrice/7
+    if currentPrice > highestPrice:
+        # after 7 days, the highest price is lower than current price
+        insight1 = dates[lowestDate]
+    if currentPrice < lowestPrice or currentPrice < highestPrice:
+        # after 7 days, the price is higher, so do nothing
+        insight1 = 'NA'
+        insight2 = 'NA'
+    if highestDate < lowestDate:
+        if currentPrice <= finalPrice:
+            # sell then buy
+            insight1 = dates[highestDate]
+            insight2 = dates[lowestDate]
+        if currentPrice > finalPrice:
+            # sell then don't buy since the price going down
+            insight1 = dates[highestDate]
 
                 
 
     # print("test")
     # print(highestPrice, lowestPrice, highestDate, lowestDate, counter, currentPrice)
-
-    return {"predictions": global_var.tail(7), "insight1": insight1, "insight2": insight2}
+    # print(avgPrice)
+    return {"predictions": global_var.tail(7), "insight1": insight1, "insight2": insight2, "highestPrice": highestPrice, "lowestPrice": lowestPrice, "avg": avgPrice}
 
 
 
