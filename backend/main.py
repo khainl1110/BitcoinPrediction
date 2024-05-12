@@ -12,6 +12,7 @@ from typing import Union
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sklearn.linear_model import LinearRegression
+import asyncio
 
 global_var = None
 dataSamples = None
@@ -306,6 +307,9 @@ def is_valid_date_format(date_string):
     date_regex = r'^\d{4}-\d{2}-\d{2}$'
     return bool(re.match(date_regex, date_string))
 
+# Create a semaphore to control concurrency
+semaphore = asyncio.Semaphore(value=1)
+
 @app.get("/predict/{date1}/{date2}/{date3}/{date4}/{date5}/{date6}/{date7}")
 async def predict(date1: str, date2: str, date3: str, date4: str, date5: str, date6: str, date7: str):
     global global_var
@@ -314,24 +318,21 @@ async def predict(date1: str, date2: str, date3: str, date4: str, date5: str, da
     columns_to_keep = ['Date', 'btcHigh', 'btcLow', 'btcOpen', 'btcClose']    # Specify the columns you want to keep
     for date in dates:
         if is_valid_date_format(date):
-            X0, predHigh, predLow, predOpen, predClose = predict(date)
-            if global_var is None:
-                global_var = X0.tail()
-        
-            X0, predHigh, predLow, predOpen, predClose  = predict(date)
-            new_row = {'Date': date, 'btcHigh':predHigh, 'btcLow':predLow, 'btcOpen':predOpen, 'btcClose':predClose }
-            if (index == 0):
-                global_var.drop(global_var.index[-1], inplace=True)
-                columns_to_drop = [col for col in X0.columns if col not in columns_to_keep]
-                global_var.drop(columns=columns_to_drop, inplace=True)
-                index += 1
-            #global_var = global_var.append(new_row, ignore_index=True)
-            i = len(global_var)
-            global_var.loc[i] = new_row
-            #x_train_temp = x_train
-            #for col in global_var.columns:
-            #   global_var.at[global_var.index[-1], col] = new_row[col]
-            global_var.fillna(method='ffill', inplace=True)
+            async with semaphore:
+                X0, predHigh, predLow, predOpen, predClose = predict(date)
+                if global_var is None:
+                    global_var = X0.tail()
+                
+                X0, predHigh, predLow, predOpen, predClose  = predict(date)
+                new_row = {'Date': date, 'btcHigh':predHigh, 'btcLow':predLow, 'btcOpen':predOpen, 'btcClose':predClose }
+                if (index == 0):
+                    global_var.drop(global_var.index[-1], inplace=True)
+                    columns_to_drop = [col for col in X0.columns if col not in columns_to_keep]
+                    global_var.drop(columns=columns_to_drop, inplace=True)
+                    index += 1
+                i = len(global_var)
+                global_var.loc[i] = new_row
+                global_var.fillna(method='ffill', inplace=True)
         else:
             return {"Validation": "Invalid Date format. Expected YYYY-MM-DD!"}
 
@@ -342,8 +343,6 @@ async def predict(date1: str, date2: str, date3: str, date4: str, date5: str, da
     indicator = global_var['btcOpen'].tail(6)
     indicatorDate = global_var['Date'].tail(6)
   
-
-    # Assuming global_var['Open'].tail(6) contains the prices at different times
     prices = global_var['btcOpen'].tail(6).to_dict()
     dates = global_var['Date'].tail(6).to_dict()
 
@@ -383,29 +382,18 @@ async def predict(date1: str, date2: str, date3: str, date4: str, date5: str, da
 
     avgPrice = avgPrice/7
     if currentPrice > highestPrice:
-        # after 7 days, the highest price is lower than current price
         insight1 = dates[lowestDate]
     if currentPrice < lowestPrice or currentPrice < highestPrice:
-        # after 7 days, the price is higher, so do nothing
         insight1 = 'NA'
         insight2 = 'NA'
     if highestDate < lowestDate:
         if currentPrice <= finalPrice:
-            # sell then buy
             insight1 = dates[highestDate]
             insight2 = dates[lowestDate]
         if currentPrice > finalPrice:
-            # sell then don't buy since the price going down
             insight1 = dates[highestDate]
 
-                
-
-    # print("test")
-    # print(highestPrice, lowestPrice, highestDate, lowestDate, counter, currentPrice)
-    # print(avgPrice)
     return {"predictions": global_var.tail(7), "insight1": insight1, "insight2": insight2, "highestPrice": highestPrice, "lowestPrice": lowestPrice, "avg": avgPrice}
-
-
 
 def predict(date):
     global dataSamples
