@@ -1,17 +1,17 @@
 {
   "files": {
     "main.css": "/BitcoinPrediction/static/css/main.f855e6bc.css",
-    "main.js": "/BitcoinPrediction/static/js/main.72036419.js",
+    "main.js": "/BitcoinPrediction/static/js/main.b6a12644.js",
     "static/js/453.ed3810f9.chunk.js": "/BitcoinPrediction/static/js/453.ed3810f9.chunk.js",
     "static/media/axios.cjs": "/BitcoinPrediction/static/media/axios.22fc11ea5e9ce56fa9da.cjs",
     "static/media/logo.svg": "/BitcoinPrediction/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
     "index.html": "/BitcoinPrediction/index.html",
     "main.f855e6bc.css.map": "/BitcoinPrediction/static/css/main.f855e6bc.css.map",
-    "main.72036419.js.map": "/BitcoinPrediction/static/js/main.72036419.js.map",
+    "main.b6a12644.js.map": "/BitcoinPrediction/static/js/main.b6a12644.js.map",
     "453.ed3810f9.chunk.js.map": "/BitcoinPrediction/static/js/453.ed3810f9.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.f855e6bc.css",
-    "static/js/main.72036419.js"
+    "static/js/main.b6a12644.js"
   ]
 }
