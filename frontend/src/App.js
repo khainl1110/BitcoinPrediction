@@ -14,6 +14,7 @@ function App() {
   const [dateThreeDaysAfter, setDateThreeDaysAfter] = useState('');
   const [dateTwoDaysAfter, setDateTwoDaysAfter] = useState('');
   const [dateOneDaysAfter, setDateOneDaysAfter] = useState('');
+  const [dateToday, setDateToday] = useState('');
 
   const [data, setData] = useState([]);
   const [featuresDate, setFeaturesDate] = useState([]);
@@ -23,9 +24,13 @@ function App() {
   const [featuresClose, setFeaturesClose] = useState([]);
   const [insight, setInsight] = useState("");
   const [insight2, setInsight2] = useState("");
+  const [highestPrice, setHighestPrice] = useState('');
+  const [lowestPrice, setLowestPrice] = useState('');
+  const [averageClosingPrice, setAverageClosingPrice] = useState('');
 
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading] = useState(true); // State variable to track loading state
+
 
   const [todaysDate, setTodaysDate] = useState('');
 
@@ -112,6 +117,10 @@ function App() {
       dateOneDaysAfter.setDate(dateOneDaysAfter.getDate() + 0);
       setDateOneDaysAfter(dateOneDaysAfter.toISOString().split('T')[0]);
 
+      const dateToday = new Date(enteredDate);
+      setDateToday(dateToday.toISOString().split('T')[0]);
+
+
     } else {
       // Clear the calculated date if the entered value is not a valid date
       setDateSevenDaysAfter('');
@@ -142,14 +151,19 @@ function App() {
           setFeaturesClose(data.predictions.btcClose)
           setInsight(data.insight1)
           setInsight2(data.insight2)
+          setHighestPrice(data.highestPrice)
+          setLowestPrice(data.lowestPrice)
+          setAverageClosingPrice(data.avg);
           setData(data); // Set the data in state
         })
+      setLoading(false)
     } catch (error) {
       // Handle any errors that occur during the request
       console.error('Error fetching data:', error);
     } finally {
       setLoading(false); // Set loading to false after the request completes
     }
+
   };
 
   let dataArrayOpen = [];
@@ -220,7 +234,7 @@ function App() {
           <h2>Bitcoin Price Predictor</h2>
           <p>Choose a starting date to predict the price of Bitcoin over the next seven days.</p>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             <div>
               <text>Start Date: </text>
@@ -238,67 +252,130 @@ function App() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', border: '1px solid black', justifyContent: 'center'}}>
-        <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
-          {renderHeader('Date')}
-          {dataArrayDate.map((item, index) => ( // Include index parameter
-            <li key={item.id} style={rowStyle}>
-              <span style={{ padding: '10px', fontWeight: 'bold' }}>{index}</span> {/* Display the index count */}
-              {renderItem({ item })}
-            </li>
-          ))}
-        </ul>
-        <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
-          {renderHeader('Open')}
-          {dataArrayOpen.map(item => (
-            <li key={item.id} style={rowStyle}>
-              <span>$</span>
-              {renderItem({ item })}
-            </li>
-          ))}
-        </ul>
-        <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
-          {renderHeader('Close')}
-          {dataArrayClose.map(item => (
-            <li key={item.id} style={rowStyle}>
-              <span>$</span>
-              {renderItem({ item })}
-            </li>
-          ))}
-        </ul>
-        <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
-          {renderHeader('High')}
-          {dataArrayHigh.map(item => (
-            <li key={item.id} style={rowStyle}>
-              <span>$</span> {/* Display the item with "$" symbol */}
-              {renderItem({ item })}
-            </li>
-          ))}
-        </ul>
-        <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
-          {renderHeader('Low')}
-          {reverseDataArrayLow.map(item => (
-            <li key={item.id} style={rowStyle}>
-              <span>$</span>
-              {renderItem({ item })}
-            </li>
-          ))}
-        </ul>
-        <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px', al: 'flext-start', width: '30%'}}>
-            <div style={{ display: 'flex', flexDirection: 'row'}}>
+      <div style={{ display: 'flex', flexDirection: 'row', border: '1px solid black', justifyContent: 'space-around', alignItems: 'center' }}>
+        <div>
+          {
+            loading !== true ? (
+
+              <>
+                <div>
+                  <h3>Predicted Open, Close, High, Low</h3>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'row' }}>
+                  <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
+                    {renderHeader('Date')}
+                    {dataArrayDate.map((item, index) => (
+                      <li key={item.id} style={rowStyle}>
+                        <span style={{ padding: '10px', fontWeight: 'bold' }}>{index}</span>
+                        {renderItem({ item })}
+                      </li>
+                    ))}
+                  </ul>
+                  <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
+                    {renderHeader('Open')}
+                    {dataArrayOpen.map(item => (
+                      <li key={item.id} style={rowStyle}>
+                        <span>$</span>
+                        {renderItem({ item })}
+                      </li>
+                    ))}
+                  </ul>
+                  <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
+                    {renderHeader('Close')}
+                    {dataArrayClose.map(item => (
+                      <li key={item.id} style={rowStyle}>
+                        <span>$</span>
+                        {renderItem({ item })}
+                      </li>
+                    ))}
+                  </ul>
+                  <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
+                    {renderHeader('High')}
+                    {dataArrayHigh.map(item => (
+                      <li key={item.id} style={rowStyle}>
+                        <span>$</span>
+                        {renderItem({ item })}
+                      </li>
+                    ))}
+                  </ul>
+                  <ul style={{ listStyle: 'none', padding: 0, marginRight: '5px' }}>
+                    {renderHeader('Low')}
+                    {reverseDataArrayLow.map(item => (
+                      <li key={item.id} style={rowStyle}>
+                        <span>$</span>
+                        {renderItem({ item })}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </>
+            ) : (
+              <h2>Calculating predictions...</h2>
+            )
+          }
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', }}>
+          <div>
+            <text>You have selected today as {dateToday}. BitSmart has made the following predictions</text>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', }}>
+            <div style={{ padding: '10px', borderBottom: '1px solid black' }}>
+              <b>Predicted Prices (in USD) for the next seven days are: </b>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'row', padding: '10px', borderBottom: '1px solid black' }}>
+              <b>Highest Price: </b>
+              {
+                 loading !== true ?
+                 <text>{highestPrice}</text> 
+                 : <text style={{ color: 'red' }}>Loading</text>
+              }
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'row', padding: '10px', borderBottom: '1px solid black' }}>
+              <b>Lowest Price: </b>
+              {
+                 loading !== true ?
+                 <text>{lowestPrice}</text> 
+                 : <text style={{ color: 'red' }}>Loading</text>
+              }
+             
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'row', padding: '10px', borderBottom: '1px solid black' }}>
+              <b>Average Closing Price: </b>
+              {
+                 loading !== true ?
+                 <text>{averageClosingPrice}</text> 
+                 : <text style={{ color: 'red' }}>Loading</text>
+              }
+             
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', paddingTop: '30px'}}>
+            <div style={{ padding: '10px', borderBottom: '1px solid black' }}>
               <b>Recommended swing strategy </b>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'row'}}>
-              <b>Sell All</b>
-              <li> {insight}</li>
+            <div style={{ display: 'flex', flexDirection: 'row', padding: '10px', borderBottom: '1px solid black' }}>
+              <b>Sell All: </b>
+              {
+                 loading !== true ?
+                 <text>{insight}</text> 
+                 : <text style={{ color: 'red' }}>Loading</text>
+              }
             </div>
-            <div style={{ display: 'flex', flexDirection: 'row'}}>
-              <b>All In</b>
-              <li> {insight2}</li>
+            <div style={{ display: 'flex', flexDirection: 'row', padding: '10px', borderBottom: '1px solid black' }}>
+              <b>All In: </b>
+              {
+                 loading !== true ?
+                 <text>{insight2}</text> 
+                 : <text style={{ color: 'red' }}>Loading</text>
+              }
+             
             </div>
-           
-           
-        </ul>
+          </div>
+
+          
+        </div>
       </div>
 
     </div>
