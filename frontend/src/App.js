@@ -133,8 +133,9 @@ function App() {
 
   const fetchData = async () => {
     setLoading(true); // Set loading to true before making the request
+    
     try {
-      const response = await fetch(`http://18.116.42.185/predict/${dateOneDaysAfter}/${dateTwoDaysAfter}/${dateThreeDaysAfter}/${dateFourDaysAfter}/${dateFiveDaysAfter}/${dateSixDaysAfter}/${dateSevenDaysAfter}`)
+      const response = await fetch(`http://3.141.29.103/predict/${dateOneDaysAfter}/${dateTwoDaysAfter}/${dateThreeDaysAfter}/${dateFourDaysAfter}/${dateFiveDaysAfter}/${dateSixDaysAfter}/${dateSevenDaysAfter}`)
         .then(response => {
           if (!response.ok) {
             throw new Error('Failed to fetch data');
