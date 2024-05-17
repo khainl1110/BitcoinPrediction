@@ -3,6 +3,8 @@ import './App.css';
 
 function App() {
 
+  const api = 'http://3.137.166.30';
+
   // State to store the input value
   const [inputValue, setInputValue] = useState('');
   const [dateSevenDaysAfter, setDateSevenDaysAfter] = useState('');
@@ -136,7 +138,7 @@ function App() {
     setLoading(true); // Set loading to true before making the request
     setLoadingMessage("Calculating Predictions...");
     try {
-      const response = await fetch(`http://3.141.29.103/predict/${dateOneDaysAfter}/${dateTwoDaysAfter}/${dateThreeDaysAfter}/${dateFourDaysAfter}/${dateFiveDaysAfter}/${dateSixDaysAfter}/${dateSevenDaysAfter}`)
+      const response = await fetch(`${api}/predict/${dateOneDaysAfter}/${dateTwoDaysAfter}/${dateThreeDaysAfter}/${dateFourDaysAfter}/${dateFiveDaysAfter}/${dateSixDaysAfter}/${dateSevenDaysAfter}`)
         .then(response => {
           if (!response.ok) {
             throw new Error('Failed to fetch data');
