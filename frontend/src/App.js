@@ -245,7 +245,7 @@ function App() {
                 type="date"
                 value={inputValue}
                 onChange={handleInputChange}
-                min={tomorrowFormatted} 
+                min={tomorrowFormatted}
                 placeholder="YYYY-MM-DD"
               />
             </div>
@@ -329,58 +329,74 @@ function App() {
             <div style={{ display: 'flex', flexDirection: 'row', padding: '10px', borderBottom: '1px solid black' }}>
               <b>Highes Open Price: </b>
               {
-                 loading !== true ?
-                 <text>{highestPrice}</text> 
-                 : <text style={{ color: 'red' }}>Loading</text>
+                loading !== true ?
+                  <text>{highestPrice}</text>
+                  : <text style={{ color: 'red' }}>Loading</text>
               }
             </div>
             <div style={{ display: 'flex', flexDirection: 'row', padding: '10px', borderBottom: '1px solid black' }}>
               <b>Lowest Open Price: </b>
               {
-                 loading !== true ?
-                 <text>{lowestPrice}</text> 
-                 : <text style={{ color: 'red' }}>Loading</text>
+                loading !== true ?
+                  <text>{lowestPrice}</text>
+                  : <text style={{ color: 'red' }}>Loading</text>
               }
-             
+
             </div>
             <div style={{ display: 'flex', flexDirection: 'row', padding: '10px', borderBottom: '1px solid black' }}>
               <b>Average Closing Price: </b>
               {
-                 loading !== true ?
-                 <text>{averageClosingPrice}</text> 
-                 : <text style={{ color: 'red' }}>Loading</text>
+                loading !== true ?
+                  <text>{averageClosingPrice}</text>
+                  : <text style={{ color: 'red' }}>Loading</text>
               }
-             
+
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', paddingTop: '30px'}}>
+          <div style={{ display: 'flex', flexDirection: 'column', paddingTop: '30px' }}>
             <div style={{ padding: '10px', borderBottom: '1px solid black' }}>
               <b>Recommended swing strategy </b>
             </div>
             <div style={{ display: 'flex', flexDirection: 'row', padding: '10px', borderBottom: '1px solid black' }}>
               <b>Sell All: </b>
               {
-                 loading !== true ?
-                 <text>{insight}</text> 
-                 : <text style={{ color: 'red' }}>Loading</text>
+                loading !== true ?
+                  <text>{insight}</text>
+                  : <text style={{ color: 'red' }}>Loading</text>
               }
             </div>
             <div style={{ display: 'flex', flexDirection: 'row', padding: '10px', borderBottom: '1px solid black' }}>
               <b>All In: </b>
               {
-                 loading !== true ?
-                 <text>{insight2}</text> 
-                 : <text style={{ color: 'red' }}>Loading</text>
+                loading !== true ?
+                  <text>{insight2}</text>
+                  : <text style={{ color: 'red' }}>Loading</text>
               }
-             
+
             </div>
           </div>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', paddingTop: '30px', width: '25%'}}>
+          <div style={{ padding: '10px', borderBottom: '1px solid black' }}>
+            <text>As our current backend operates on HTTP, Chrome might encounter issues accessing the app due to HTTP blocking. If you're experiencing difficulties, follow these steps in Chrome:</text>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'row', padding: '10px', borderBottom: '1px solid black' }}>
+            <text>1. Look for the padlock icon 🔒 or "Not secure" label next to the URL.</text>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'row', padding: '10px', borderBottom: '1px solid black' }}>
+            <text>2. Click on the icon or label to open the site settings.</text>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'row', padding: '10px', borderBottom: '1px solid black' }}>
+            <text>3. Scroll down to "Insecure content" and select "Allow" to enable HTTP requests.</text>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'row', padding: '10px', borderBottom: '1px solid black' }}>
+            <text>4. You should now be able to use the app without any issues.</text>
+          </div>
 
-          
+
         </div>
       </div>
-
     </div>
   );
 }
