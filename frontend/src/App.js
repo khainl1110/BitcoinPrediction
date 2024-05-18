@@ -1,9 +1,10 @@
-import logo from './logo.svg';
 import React, { useState, useContext, useEffect } from 'react';
 import './App.css';
-import { create } from 'apisauce';
 
 function App() {
+
+  // const api = 'https://cors-anywhere.herokuapp.com/http://3.137.166.30';
+  const api = "http://127.0.0.1:8000"
 
   // State to store the input value
   const [inputValue, setInputValue] = useState('');
@@ -30,6 +31,7 @@ function App() {
 
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading] = useState(true); // State variable to track loading state
+  const [loadingMessage, setLoadingMessage] = useState("Please select a date then click Predict. ");
 
 
   const [todaysDate, setTodaysDate] = useState('');
@@ -135,11 +137,9 @@ function App() {
 
   const fetchData = async () => {
     setLoading(true); // Set loading to true before making the request
+    setLoadingMessage("Calculating Predictions...");
     try {
-      //  temp = 18.116.42.185
-      const response = await fetch(`https://cors-anywhere.herokuapp.com/http://3.137.166.30/predict/${dateOneDaysAfter}/${dateTwoDaysAfter}/${dateThreeDaysAfter}/${dateFourDaysAfter}/${dateFiveDaysAfter}/${dateSixDaysAfter}/${dateSevenDaysAfter}`, {
-        origin: '*'
-      })
+      const response = await fetch(`${api}/predict/${dateOneDaysAfter}/${dateTwoDaysAfter}/${dateThreeDaysAfter}/${dateFourDaysAfter}/${dateFiveDaysAfter}/${dateSixDaysAfter}/${dateSevenDaysAfter}`)
         .then(response => {
           if (!response.ok) {
             throw new Error('Failed to fetch data');
@@ -160,6 +160,7 @@ function App() {
           setData(data); // Set the data in state
         })
       setLoading(false)
+      setLoadingMessage("Please select a date then click Predict. ");
     } catch (error) {
       // Handle any errors that occur during the request
       console.error('Error fetching data:', error);
@@ -234,7 +235,7 @@ function App() {
     <div className="App">
       <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', backgroundColor: '#FCCB00' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-          <h2>Bitcoin Price Predictor</h2>
+          <h2>BitSmart</h2>
           <p>Choose a starting date to predict the price of Bitcoin over the next seven days.</p>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
@@ -245,6 +246,7 @@ function App() {
                 type="date"
                 value={inputValue}
                 onChange={handleInputChange}
+                min={tomorrowFormatted} 
                 placeholder="YYYY-MM-DD"
               />
             </div>
@@ -259,7 +261,6 @@ function App() {
         <div>
           {
             loading !== true ? (
-
               <>
                 <div>
                   <h3>Predicted Open, Close, High, Low</h3>
@@ -313,7 +314,7 @@ function App() {
                 </div>
               </>
             ) : (
-              <h2>Calculating predictions...</h2>
+              <h2>{loadingMessage}</h2>
             )
           }
         </div>
@@ -327,7 +328,7 @@ function App() {
               <b>Predicted Prices (in USD) for the next seven days are: </b>
             </div>
             <div style={{ display: 'flex', flexDirection: 'row', padding: '10px', borderBottom: '1px solid black' }}>
-              <b>Highest Price: </b>
+              <b>Highes Open Price: </b>
               {
                  loading !== true ?
                  <text>{highestPrice}</text> 
@@ -335,7 +336,7 @@ function App() {
               }
             </div>
             <div style={{ display: 'flex', flexDirection: 'row', padding: '10px', borderBottom: '1px solid black' }}>
-              <b>Lowest Price: </b>
+              <b>Lowest Open Price: </b>
               {
                  loading !== true ?
                  <text>{lowestPrice}</text> 
