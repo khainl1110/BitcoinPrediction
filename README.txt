@@ -1,7 +1,7 @@
 1. Team member:
     Khai Nguyen - khailuu.nguyen@sjsu.edu - 013899275
     Guiler Dalit - guiller.dalit@sjsu.edu - 012568101
-    Suh Young Joon
+    Suh Young Joon - young.suh@sjsu.edu - 015391571
 
 2. The URL for the app is: https://khainl1110.github.io/BitcoinPrediction/
 3. Special instruction for the app:
