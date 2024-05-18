@@ -389,27 +389,21 @@ async def predict(date1: str, date2: str, date3: str, date4: str, date5: str, da
     # print("test")
     # print(currentPrice, highestPrice, lowestPrice)
     # print("test1")
-    # after 7 days, price go down, sell on highest price (which is the first date)
-    if currentPrice == highestPrice:
-        insight1 = dates[highestDate]
-        print("first strategy")
-        # buy again if the bottom is less than final price, which means it go up
-        if lowestPrice < finalPrice:
-            insight2 = dates[lowestDate]
-            print("second strategy")
 
-    # after 7 days, price go up
+    if currentPrice <= finalPrice:
+        if currentPrice < highestPrice and highestPrice > finalPrice:
+            insight1 = dates[highestDate]
+            insight2 = dates[finalDate]
+            # print("first strategy")
+        else:
+            insight1 = 'NA'
+            insight2 = 'NA'
+            # print("second strategy")
     else:
-        if currentPrice <= highestPrice:
-            # if peaked then go down, swing trade
-            if highestPrice > finalPrice and currentPrice > finalPrice:
-                insight1 = dates[highestDate]
-                insight2 = dates[finalDate]
-                print('Third strategy')
-            else:
-                insight1 = 'NA'
-                insight2 = 'NA'
-                print("Fourth strategy")
+            # sell all
+            insight1 = dates[highestDate]
+            # print("third strategy")
+           
 
     return {"predictions": global_var.tail(7), "insight1": insight1, "insight2": insight2, "highestPrice": highestPrice, "lowestPrice": lowestPrice, "avg": avgPrice}
 
