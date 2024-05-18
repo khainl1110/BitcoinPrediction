@@ -13,3 +13,4 @@
         3. Go down to Insecure content and Chooses Allow
         4. Use the app
     Then the website will have Pop up like not secured, but the backend will works
+    Refer to 'View app instruction' pdf file for steps with pictures

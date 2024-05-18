@@ -1,4 +1,0 @@
-# BitcoinPrediction
-Bitcoin prediction project
-
-
