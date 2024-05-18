@@ -232,7 +232,7 @@ function App() {
   }
 
   return (
-    <div className="App">
+    <div className="App" style={{fontSize: '14px'}}>
       <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', backgroundColor: '#FCCB00' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
           <h2>BitSmart</h2>
@@ -318,7 +318,7 @@ function App() {
             )
           }
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
           <div>
             <text>You have selected today as {dateToday}. BitSmart has made the following predictions</text>
           </div>
@@ -378,7 +378,7 @@ function App() {
             </div>
           </div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', paddingTop: '30px', width: '25%'}}>
+        <div style={{ display: 'flex', flexDirection: 'column', paddingTop: '30px', width: '25%', }}>
           <div style={{ padding: '10px', borderBottom: '1px solid black' }}>
             <text>As our current backend operates on HTTP, Chrome might encounter issues accessing the app due to HTTP blocking. If you're experiencing difficulties, follow these steps in Chrome:</text>
           </div>
