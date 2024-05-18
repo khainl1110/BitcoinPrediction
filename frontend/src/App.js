@@ -3,7 +3,8 @@ import './App.css';
 
 function App() {
 
-  const api = 'http://3.137.166.30';
+  // const api = 'https://cors-anywhere.herokuapp.com/http://3.137.166.30';
+  const api = "http://3.137.166.30"
 
   // State to store the input value
   const [inputValue, setInputValue] = useState('');
