@@ -136,7 +136,10 @@ function App() {
   const fetchData = async () => {
     setLoading(true); // Set loading to true before making the request
     try {
-      const response = await fetch(`http://18.116.42.185/predict/${dateOneDaysAfter}/${dateTwoDaysAfter}/${dateThreeDaysAfter}/${dateFourDaysAfter}/${dateFiveDaysAfter}/${dateSixDaysAfter}/${dateSevenDaysAfter}`)
+      //  temp = 18.116.42.185
+      const response = await fetch(`https://cors-anywhere.herokuapp.com/http://3.137.166.30/predict/${dateOneDaysAfter}/${dateTwoDaysAfter}/${dateThreeDaysAfter}/${dateFourDaysAfter}/${dateFiveDaysAfter}/${dateSixDaysAfter}/${dateSevenDaysAfter}`, {
+        origin: '*'
+      })
         .then(response => {
           if (!response.ok) {
             throw new Error('Failed to fetch data');
