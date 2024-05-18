@@ -232,7 +232,7 @@ function App() {
   }
 
   return (
-    <div className="App" style={{fontSize: '14px'}}>
+    <div className="App" style={{fontSize: '13px'}}>
       <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', backgroundColor: '#FCCB00' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
           <h2>BitSmart</h2>
@@ -257,7 +257,7 @@ function App() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'row', border: '1px solid black', justifyContent: 'space-around', alignItems: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'row', border: '1px solid black', justifyContent: 'space-around', alignItems: 'flex-start' }}>
         <div>
           {
             loading !== true ? (
@@ -318,17 +318,19 @@ function App() {
             )
           }
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', paddingTop: '30px'}}>
           <div>
-            <text>You have selected today as {dateToday}. BitSmart has made the following predictions</text>
+            <text>You have selected today as {dateToday}. </text>
+           
           </div>
+          <text>BitSmart has made the following predictions</text>
 
           <div style={{ display: 'flex', flexDirection: 'column', }}>
             <div style={{ padding: '10px', borderBottom: '1px solid black' }}>
               <b>Predicted Prices (in USD) for the next seven days are: </b>
             </div>
             <div style={{ display: 'flex', flexDirection: 'row', padding: '10px', borderBottom: '1px solid black' }}>
-              <b>Highes Open Price: </b>
+              <b>Highest Open Price: </b>
               {
                 loading !== true ?
                   <text>{highestPrice}</text>
@@ -374,11 +376,10 @@ function App() {
                   <text>{insight2}</text>
                   : <text style={{ color: 'red' }}>Loading</text>
               }
-
             </div>
           </div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', paddingTop: '30px', width: '25%', }}>
+        <div style={{ display: 'flex', flexDirection: 'column', paddingTop: '30px', width: '25%', top: 0 }}>
           <div style={{ padding: '10px', borderBottom: '1px solid black' }}>
             <text>As our current backend operates on HTTP, Chrome might encounter issues accessing the app due to HTTP blocking. If you're experiencing difficulties, follow these steps in Chrome:</text>
           </div>
