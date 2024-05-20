@@ -246,7 +246,6 @@ function App() {
                 type="date"
                 value={inputValue}
                 onChange={handleInputChange}
-                min={tomorrowFormatted}
                 placeholder="YYYY-MM-DD"
               />
             </div>
